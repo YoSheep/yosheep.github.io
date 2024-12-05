@@ -4,7 +4,12 @@
 
     <sitemap>
         <loc>http://yosheep.github.io/post-sitemap.xml</loc>
-        <lastmod>2024-05-05T01:49:44.982Z</lastmod>
+        <lastmod>2024-12-05T17:00:23.800Z</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>http://yosheep.github.io/page-sitemap.xml</loc>
+        <lastmod>2024-12-05T16:21:48.426Z</lastmod>
     </sitemap>
 
 </sitemapindex>
