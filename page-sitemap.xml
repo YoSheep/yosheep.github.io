@@ -10,6 +10,15 @@
     
     
     <url>
+        <loc>http://yosheep.github.io/tags/</loc>
+        <lastmod>2024-12-11T05:38:41.064Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    
+    
+    <url>
         <loc>http://yosheep.github.io/link/</loc>
         <lastmod>2024-12-06T01:55:39.038Z</lastmod>
         <changefreq>weekly</changefreq>
