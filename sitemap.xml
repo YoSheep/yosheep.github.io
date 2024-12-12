@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yosheep.github.io/2024/12/12/%E9%80%86%E5%90%91%E5%AD%A6%E4%B9%A0-IDA%E7%9A%84%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AE%9E%E8%B7%B5/</loc>
+    
+    <lastmod>2024-12-12</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://yosheep.github.io/tags/index.html</loc>
     
     <lastmod>2024-12-11</lastmod>
