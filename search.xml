@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>参数化查询对SQL注入的防护思考---曾经自信的误判</title>
+      <link href="/2024/12/13/%E5%8F%82%E6%95%B0%E5%8C%96%E6%9F%A5%E8%AF%A2%E5%AF%B9SQL%E6%B3%A8%E5%85%A5%E7%9A%84%E9%98%B2%E6%8A%A4%E6%80%9D%E8%80%83-%E6%9B%BE%E7%BB%8F%E8%87%AA%E4%BF%A1%E7%9A%84%E8%AF%AF%E5%88%A4/"/>
+      <url>/2024/12/13/%E5%8F%82%E6%95%B0%E5%8C%96%E6%9F%A5%E8%AF%A2%E5%AF%B9SQL%E6%B3%A8%E5%85%A5%E7%9A%84%E9%98%B2%E6%8A%A4%E6%80%9D%E8%80%83-%E6%9B%BE%E7%BB%8F%E8%87%AA%E4%BF%A1%E7%9A%84%E8%AF%AF%E5%88%A4/</url>
+      
+        <content type="html"><![CDATA[<h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿鼓吹。</p><p>直到前两日，xsheep师傅突然在群里聊到之前尝试挖洞的一个站，通过一个注入点进行报错注入，已经通过<code>database()</code>和<code>user()</code>拿到了回显的情况下，想要再进一步，爆出表名等信息时出现了问题。拿到了师傅分享的链接后，我也尝试了半天，确实一直没办法进一步利用，一直重复出现的都是那几个报错，甚至让我一度怀疑我的payload编写的问题。后来了解到，在特定情况下，PDO的预编译，好像真没法完全阻止我们注入的SQL语句。</p><h2 id="参数化查询"><a href="#参数化查询" class="headerlink" title="参数化查询"></a>参数化查询</h2><p>参数化查询是用于数据库操作的一种方法，能够在一定程度上防止SQL注入，其核心主要是<strong>预编译</strong>和<strong>绑定参数</strong>。</p><p><strong>预编译</strong>：SQL语句和参数分离，数据库先对SQL语句模版进行解析和编译。</p><p><strong>绑定参数</strong>：将用户输入的数据绑定到SQL模版中的占位符上，可以避免直接嵌入SQL语句。</p><p>参数化查询数据库服务器不会直接把参数的内容作为SQL语句的一部分执行，而是数据库会先对SQL语句进行编译，而后代入参数执行。常规的SQL注入，主要就是利用一些过滤限制不足，导致可以将我们自行构造的SQL语句注入到原本的SQL语句中来执行。但是在参数化查询的过程中，语句是语句，参数是参数，参数的值不会被当作语句的一部分执行。</p><p>以下以PHP下的参数化查询作为例子。</p><p>常规查询功能示例。此时如果<code>$username</code>和<code>$password</code>两个参数是可控的情况下，就可能会造成被插入恶意SQL语句的情况：</p><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 构造SQL查询</span></span><br><span class="line"><span class="variable">$sql</span> = <span class="string">&quot;SELECT * FROM users WHERE username = &#x27;<span class="subst">$username</span>&#x27; AND password = &#x27;<span class="subst">$password</span>&#x27;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">query</span>(<span class="variable">$sql</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure><p>PDO参数化查询示例。对SQL语句进行预编译，而后绑定参数，将输入和SQL模版分离：</p><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 预编译SQL语句</span></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">prepare</span>(<span class="string">&#x27;SELECT * FROM users WHERE username = :username AND password = :password&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 绑定参数</span></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:username&#x27;</span>, <span class="variable">$username</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:password&#x27;</span>, <span class="variable">$password</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置输入</span></span><br><span class="line"><span class="variable">$username</span> = <span class="string">&#x27;admin&#x27;</span>;</span><br><span class="line"><span class="variable">$password</span> = <span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">execute</span>();</span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">fetchAll</span>();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> WEB </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> WEB </tag>
+            
+            <tag> SQL注入 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>逆向学习(3)---IDA的使用和实践</title>
       <link href="/2024/12/12/%E9%80%86%E5%90%91%E5%AD%A6%E4%B9%A0-IDA%E7%9A%84%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AE%9E%E8%B7%B5/"/>
       <url>/2024/12/12/%E9%80%86%E5%90%91%E5%AD%A6%E4%B9%A0-IDA%E7%9A%84%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AE%9E%E8%B7%B5/</url>
