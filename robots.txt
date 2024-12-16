@@ -9,5 +9,5 @@ Disallow: /photos/
 Disallow: /*.css
 Disallow: /*.js
 
-Sitemap: https://blog.imzjw.cn/sitemap.xml
-Sitemap: https://blog.imzjw.cn/baidusitemap.xml
+Sitemap: https://yosheep.github.io/sitemap.xml
+Sitemap: https://yosheep.github.io/baidusitemap.xml
