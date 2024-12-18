@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>大模型提示词---Prompt Engineering（提示工程） | YoSheep's Blog</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="大语言模型相信现在大家都是用的非常多，但为了能够更准确、更匹配的得到我们想要的，就需要我们提供一些提示词给模型，例如平常互联网上整活时给模型发的，“假设你是我对象，请你用哄对象的语气和我说话，并且每次说完之后都要说一次mua～”。  提示词工程（Prompt Engineering）是指在与人工智能模型（尤其是语言模型）交互时，通过精心设计和优化输入的提示（prompt），以引导模型生成所需的输出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大模型提示词---Prompt Engineering（提示工程）">
+<meta property="og:url" content="https://yosheep.github.io/posts/6245f930.html">
+<meta property="og:site_name" content="YoSheep&#39;s Blog">
+<meta property="og:description" content="大语言模型相信现在大家都是用的非常多，但为了能够更准确、更匹配的得到我们想要的，就需要我们提供一些提示词给模型，例如平常互联网上整活时给模型发的，“假设你是我对象，请你用哄对象的语气和我说话，并且每次说完之后都要说一次mua～”。  提示词工程（Prompt Engineering）是指在与人工智能模型（尤其是语言模型）交互时，通过精心设计和优化输入的提示（prompt），以引导模型生成所需的输出">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yosheep.github.io/img/yeah_circle.jpg">
+<meta property="article:published_time" content="2024-12-17T16:14:29.000Z">
+<meta property="article:modified_time" content="2024-12-18T05:39:35.028Z">
+<meta property="article:author" content="YoSheep">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="Prompt">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yosheep.github.io/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.github.io/posts/6245f930.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's Blog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '大模型提示词---Prompt Engineering（提示工程）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-18 13:39:35'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's Blog"><span class="site-name">YoSheep's Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">大模型提示词---Prompt Engineering（提示工程）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-17T16:14:29.000Z" title="发表于 2024-12-18 00:14:29">2024-12-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-18T05:39:35.028Z" title="更新于 2024-12-18 13:39:35">2024-12-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI/">AI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.1k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="大模型提示词---Prompt Engineering（提示工程）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/6245f930.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/6245f930.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>大语言模型相信现在大家都是用的非常多，但为了能够更准确、更匹配的得到我们想要的，就需要我们提供一些提示词给模型，例如平常互联网上整活时给模型发的，“假设你是我对象，请你用哄对象的语气和我说话，并且每次说完之后都要说一次mua～”。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241218005033617.png" alt="image-20241218005033617"></p>
+<p>提示词工程（Prompt Engineering）是指在与人工智能模型（尤其是语言模型）交互时，通过<strong>精心设计</strong>和<strong>优化输入</strong>的提示（prompt），以引导模型生成所需的输出。其目的是通过明确、结构化的语言指令、问题或任务描述，最大程度地提高模型生成内容的准确性、相关性和有效性。输入的提示词可以是一个问题、一个描述、一组关键词或上下文信息，用来告知模型我们希望得到的输出类型和内容。</p>
+<p>提示词是一门经验科学，通常是基于启发式的，想要写出一段好的提示词需要很多很多次的测试来发现最好的提示词，而且能生产更有效的内容 。</p>
+<h2 id="为什么需要Prompt"><a href="#为什么需要Prompt" class="headerlink" title="为什么需要Prompt"></a>为什么需要Prompt</h2><p>当前大语言模型(LLM)本身已经具备了极高的性能与复杂性，但是通过精心设计的Prompt可以协助挖掘其中的潜力，引导模型生成特定需求的输出。调整Prompt的过程，就是在改变我们和模型交流的语言和方式，并且这一调整的过程不需要我们调整模型参数，只需在外部灵活调整提示词即可，降低了使用门槛。</p>
+<h2 id="Prompt的核心要素"><a href="#Prompt的核心要素" class="headerlink" title="Prompt的核心要素"></a>Prompt的核心要素</h2><p>prompt的核心要素包括：明确的任务指示、相关上下文、示例参考、用户输入以及具体的输出要求。</p>
+<ol>
+<li><strong>指示（Instructions）</strong>：想要模型执行的特定任务或指令</li>
+<li><strong>上下文（Context）</strong>：包含外部信息或额外的上下文信息，引导语言模型更好地响应</li>
+<li><strong>例子（Examples）</strong>：通过给出具体示例来展示期望的输出格式或风格</li>
+<li><strong>输入（Input）</strong>：用户输入的内容或问题</li>
+<li><strong>输出（Output）</strong>：指定输出的类型或格式</li>
+</ol>
+<h2 id="Prompt-Engineering学习"><a href="#Prompt-Engineering学习" class="headerlink" title="Prompt Engineering学习"></a>Prompt Engineering学习</h2><p>就前面所举的例子，使用的提示词仅是在客户端上和GPT交互时使用的，通常是用来执行特定的、一次性的任务，但是llm其实作为一个工具，调用他的api来快速构建软件功能是十分强大的。</p>
+<h3 id="两类LLM"><a href="#两类LLM" class="headerlink" title="两类LLM"></a>两类LLM</h3><p>在LLM的开发中，大致有两种类型的llm，分别为<strong>基础大模型（Base LLM）</strong>和<strong>指令调整型模型（Instruction tuned LLM）</strong></p>
+<ol>
+<li><strong>基础大模型</strong>：给予文本训练数据来预测接下来的文本内容，通常是由互联网上的大量数据训练后，来决定下一个最可能的单词是什么。由于数据是来源于互联网，当你询问这个模型“What’s the capital of France”，基础LLM可能基于互联网上的问答内容列表，同样返回问题：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 输入给模型</span><br><span class="line">What&#x27;s the capital of France</span><br><span class="line"># 模型的输出可能为</span><br><span class="line">What&#x27;s France&#x27;s largest city?</span><br><span class="line">What&#x27;s France&#x27;s population?</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>指令调整大模型</strong>：指令调整模型接受了遵循指示的训练，因此当询问其同样的问题时，它更有可能回到正确的答案。指令调整大模型是使用大量文本数据上训练过的基本LLM，然后使用输入和输出的指令来进行微调，进而使其更好的回答问题。然后通常还会使用一种叫做<strong>RLHF（人类反馈强化学习，Reinforcement Learning with Human FeedBack）</strong>的技术进一步优化，让系统更好的提供帮助。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 输入给模型</span><br><span class="line">What&#x27;s the capital of France</span><br><span class="line"># 模型可能的输出为</span><br><span class="line">The capital of France is Paris</span><br></pre></td></tr></table></figure>
+
+<p>因此，指令调整大模型通常可以输出更加<strong>有帮助的</strong>、<strong>诚实的</strong>、<strong>无害的</strong>结果，而不是像基础LLM那样输出有问题或有毒的输出。因此后续的重心也主要是集中于指令调整大模型。</p>
+<h3 id="如何更有效的编写提示词"><a href="#如何更有效的编写提示词" class="headerlink" title="如何更有效的编写提示词"></a>如何更有效的编写提示词</h3><p>为了编写出更好的提示词来让模型的功能更大程度的发挥，需要遵循一些原则：</p>
+<ol>
+<li>编写明确和具体的指令</li>
+<li>给模型足够的时间思考</li>
+</ol>
+<p>接下来使用openai的Python库来访问openai的API</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 安装：</span><br><span class="line">pip install openai</span><br></pre></td></tr></table></figure>
+
+<p>生成一个openai的api：<a target="_blank" rel="noopener" href="https://blog.csdn.net/cbbxn/article/details/129900104">如何获取OpenAI API Key</a></p>
+<p>api key目前已经不支持免费配额，因此需要购买，为知识和算力付费 TnT</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241218014011811.png" alt="image-20241218014011811"></p>
+<p>设置api key：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241218012950296.png" alt="image-20241218012950296"></p>
+<p>也可以直接从openai的官网取配置好的内容(此处模型使用3.5-turbo)，一方面和学习内容保持一致，一方面省钱：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI</span><br><span class="line"></span><br><span class="line">client = OpenAI(</span><br><span class="line">  api_key=<span class="string">&quot;sk-proj-xxx&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">completion = client.chat.completions.create(</span><br><span class="line">  model=<span class="string">&quot;gpt-4o-mini&quot;</span>,</span><br><span class="line">  messages=[</span><br><span class="line">    &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;write a haiku about ai&quot;</span>&#125;</span><br><span class="line">  ]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(completion.choices[<span class="number">0</span>].message);</span><br></pre></td></tr></table></figure>
+
+<p>为了更轻松的使用提示并查看生成的输出，设置函数，并使用chatgpt生成一些注释以学习：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> openai  <span class="comment"># 导入OpenAI库，用于与OpenAI的API交互</span></span><br><span class="line"><span class="keyword">import</span> os  <span class="comment"># 导入os库，用于获取操作系统级的环境变量</span></span><br><span class="line"><span class="keyword">from</span> dotenv <span class="keyword">import</span> load_dotenv, find_dotenv  <span class="comment"># 导入dotenv库，用于加载环境变量</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载当前目录或父目录中的 .env 文件</span></span><br><span class="line">_ = load_dotenv(find_dotenv())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从环境变量中获取OPENAI_API_KEY，并设置给openai库，用于身份验证</span></span><br><span class="line">openai.api_key = os.getenv(<span class="string">&quot;OPENAI_API_KEY&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_completion</span>(<span class="params">prompt, model=<span class="string">&quot;gpt-3.5-turbo&quot;</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    该函数用于向OpenAI的GPT模型发送请求，并获取生成的响应。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    参数:</span></span><br><span class="line"><span class="string">    prompt (str): 用户输入的提示文本。</span></span><br><span class="line"><span class="string">    model (str): 要使用的GPT模型，默认为&quot;gpt-3.5-turbo&quot;。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    返回:</span></span><br><span class="line"><span class="string">    str: GPT模型生成的响应内容。</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 构造消息格式，发送给API。此时假设角色是“user”，并传入prompt内容</span></span><br><span class="line">    messages = [&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: prompt&#125;]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 发送请求给OpenAI的GPT模型</span></span><br><span class="line">    response = openai.ChatCompletion.create(</span><br><span class="line">        model=model,  <span class="comment"># 选择使用的模型</span></span><br><span class="line">        messages=messages,  <span class="comment"># 传入消息列表</span></span><br><span class="line">        temperature=<span class="number">0</span>,  <span class="comment"># 设置温度为0，表示生成的文本更为确定，不会有太多随机性</span></span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 返回模型生成的响应内容</span></span><br><span class="line">    <span class="keyword">return</span> response.choices[<span class="number">0</span>].message[<span class="string">&quot;content&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>以上是看的吴恩达和OPENAI一起出的prompt的视频中的代码示例，但是由于openai库在1.0后，调用方式有些许不同，对以上代码稍作修改：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI</span><br><span class="line"></span><br><span class="line">client = OpenAI(</span><br><span class="line">    api_key= <span class="string">&#x27;sk-proj-xxx&#x27;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_completion</span>(<span class="params">prompt, model=<span class="string">&quot;gpt-3.5-turbo&quot;</span></span>):</span><br><span class="line">    messages = [&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: prompt&#125;]</span><br><span class="line">    response = client.chat.completions.create(</span><br><span class="line">        model = model,</span><br><span class="line">        messages = messages,</span><br><span class="line">        temperature = <span class="number">0</span>,</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> response.choices[<span class="number">0</span>].message.content</span><br></pre></td></tr></table></figure>
+
+<h3 id="原则一-编写明确和具体的指令"><a href="#原则一-编写明确和具体的指令" class="headerlink" title="原则一 编写明确和具体的指令"></a>原则一 编写明确和具体的指令</h3><p>通过这样可以明确的告诉模型需要他干什么，以减少我们获得不重要的信息，<strong>明确并不等于简短</strong>，因为在很多情况下，更长的提示词其实提供了更多的清晰度和上下文，可以使模型输出更清晰。</p>
+<p>编写明确且具体的指令的第一个策略，就是使用分隔符清晰的指示输入的不同部分</p>
+<p>分隔符：</p>
+<ol>
+<li>三引号（Triple quotes）：”””</li>
+<li>三反引号（Triple backticks）：```</li>
+<li>三横杠（Triple dashes）：—</li>
+<li>尖括号（Angle brackets）：&lt;&gt;</li>
+<li>XML标签：&lt;tag&gt; &lt;&#x2F;tag&gt;</li>
+</ol>
+<p>例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> text = <span class="string">f&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">You should express what you want a model to do by \</span></span><br><span class="line"><span class="string">providing instructions that are as clear and \</span></span><br><span class="line"><span class="string">specific as you can possibly make them.\</span></span><br><span class="line"><span class="string">This will guide the model towards the desired output,\</span></span><br><span class="line"><span class="string">and reduce the chances of receiving irrelevant\</span></span><br><span class="line"><span class="string"> or incorrect responses. Don&#x27;t confuse writing a\</span></span><br><span class="line"><span class="string"> clear prompt with writing a short prompt.\</span></span><br><span class="line"><span class="string"> In many cases, longer prompts provide more clarity\</span></span><br><span class="line"><span class="string"> and context for the model, which can lead to \</span></span><br><span class="line"><span class="string">more detailed and relevant outputs.</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">prompt = <span class="string">f&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">Summarize the text delimited by triple backticks\</span></span><br><span class="line"><span class="string"> into a single sentence.</span></span><br><span class="line"><span class="string">```<span class="subst">&#123;text&#125;</span>```</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">response = get_completion(prompt)</span><br><span class="line"><span class="built_in">print</span>(response)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，想要实现的功能是对text中的内容进行总结，因此提示词中说将用<code>triple backticks</code>包围起来的文本总结成一段话。执行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">It is important to provide clear and specific instructions to guide a model towards the desired output, as longer prompts can provide more clarity and context for more detailed and relevant responses.</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.github.io">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.github.io/posts/6245f930.html">https://yosheep.github.io/posts/6245f930.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.github.io" target="_blank">YoSheep's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/Prompt/">Prompt</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/10372.html" title="参数化查询对SQL注入的防护思考---曾经自信的误判"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">参数化查询对SQL注入的防护思考---曾经自信的误判</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/44904.html" title="Pytorch学习"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-09</div><div class="title">Pytorch学习</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">9</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81Prompt"><span class="toc-number">1.</span> <span class="toc-text">为什么需要Prompt</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prompt%E7%9A%84%E6%A0%B8%E5%BF%83%E8%A6%81%E7%B4%A0"><span class="toc-number">2.</span> <span class="toc-text">Prompt的核心要素</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prompt-Engineering%E5%AD%A6%E4%B9%A0"><span class="toc-number">3.</span> <span class="toc-text">Prompt Engineering学习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%B1%BBLLM"><span class="toc-number">3.1.</span> <span class="toc-text">两类LLM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%9B%B4%E6%9C%89%E6%95%88%E7%9A%84%E7%BC%96%E5%86%99%E6%8F%90%E7%A4%BA%E8%AF%8D"><span class="toc-number">3.2.</span> <span class="toc-text">如何更有效的编写提示词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%88%99%E4%B8%80-%E7%BC%96%E5%86%99%E6%98%8E%E7%A1%AE%E5%92%8C%E5%85%B7%E4%BD%93%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">3.3.</span> <span class="toc-text">原则一 编写明确和具体的指令</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/6245f930.html" title="大模型提示词---Prompt Engineering（提示工程）">大模型提示词---Prompt Engineering（提示工程）</a><time datetime="2024-12-17T16:14:29.000Z" title="发表于 2024-12-18 00:14:29">2024-12-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/10372.html" title="参数化查询对SQL注入的防护思考---曾经自信的误判">参数化查询对SQL注入的防护思考---曾经自信的误判</a><time datetime="2024-12-15T17:24:23.000Z" title="发表于 2024-12-16 01:24:23">2024-12-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/63987.html" title="逆向学习(3)---IDA的使用和实践">逆向学习(3)---IDA的使用和实践</a><time datetime="2024-12-12T08:06:26.000Z" title="发表于 2024-12-12 16:06:26">2024-12-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/14897.html" title="HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？">HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？</a><time datetime="2024-12-10T06:06:45.000Z" title="发表于 2024-12-10 14:06:45">2024-12-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/7875.html" title="逆向学习(2)---分析实践">逆向学习(2)---分析实践</a><time datetime="2024-12-07T05:22:15.000Z" title="发表于 2024-12-07 13:22:15">2024-12-07</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2024 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
+      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
+      avatar: 'monsterid',
+      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
