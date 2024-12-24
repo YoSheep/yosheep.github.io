@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>SSRF无回显情况下利用方式</title>
+      <link href="/posts/be63f512.html"/>
+      <url>/posts/be63f512.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> WEB </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> WEB </tag>
+            
+            <tag> SSRF </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>大模型提示词---Prompt Engineering（提示工程）</title>
       <link href="/posts/6245f930.html"/>
       <url>/posts/6245f930.html</url>
