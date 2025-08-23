@@ -1,0 +1,319 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>参数化查询对SQL注入的防护思考---曾经自信的误判 | YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="写在前面记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿">
+<meta property="og:type" content="article">
+<meta property="og:title" content="参数化查询对SQL注入的防护思考---曾经自信的误判">
+<meta property="og:url" content="https://yosheep.github.io/posts/10372.html">
+<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
+<meta property="og:description" content="写在前面记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yosheep.github.io/img/yeah_circle.jpg">
+<meta property="article:published_time" content="2024-12-15T17:24:23.000Z">
+<meta property="article:modified_time" content="2024-12-18T06:45:34.383Z">
+<meta property="article:author" content="YoSheep">
+<meta property="article:tag" content="WEB">
+<meta property="article:tag" content="SQL注入">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yosheep.github.io/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.github.io/posts/10372.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '参数化查询对SQL注入的防护思考---曾经自信的误判',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-18 14:45:34'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap.xml"><i class="fa-fw fa fa-sitemap"></i><span> sitemap</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap.xml"><i class="fa-fw fa fa-sitemap"></i><span> sitemap</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">参数化查询对SQL注入的防护思考---曾经自信的误判</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-15T17:24:23.000Z" title="发表于 2024-12-16 01:24:23">2024-12-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-18T06:45:34.383Z" title="更新于 2024-12-18 14:45:34">2024-12-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/WEB/">WEB</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.4k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="参数化查询对SQL注入的防护思考---曾经自信的误判"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/10372.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/10372.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿鼓吹。</p>
+<p>直到前两日，xsheep师傅突然在群里聊到之前尝试挖洞的一个站，通过一个注入点进行报错注入，已经通过<code>database()</code>和<code>user()</code>拿到了回显的情况下，想要再进一步，爆出表名等信息时出现了问题。</p>
+<p>拿到了师傅分享的链接后，我也尝试了半天，确实一直没办法进一步利用，一直重复出现的都是那几个报错，甚至让我一度怀疑我的payload编写的问题。后来了解到，在特定情况下，PDO的预编译，好像真没法完全阻止我们注入的SQL语句。</p>
+<h2 id="参数化查询"><a href="#参数化查询" class="headerlink" title="参数化查询"></a>参数化查询</h2><p>参数化查询是用于数据库操作的一种方法，能够在一定程度上防止SQL注入，其核心主要是<strong>预编译</strong>和<strong>绑定参数</strong>。</p>
+<p><strong>预编译</strong>：SQL语句和参数分离，数据库先对SQL语句模版进行解析和编译。</p>
+<p><strong>绑定参数</strong>：将用户输入的数据绑定到SQL模版中的占位符上，可以避免直接嵌入SQL语句。</p>
+<p>参数化查询数据库服务器不会直接把参数的内容作为SQL语句的一部分执行，而是数据库会先对SQL语句进行编译，而后代入参数执行。常规的SQL注入，主要就是利用一些过滤限制不足，导致可以将我们自行构造的SQL语句注入到原本的SQL语句中来执行。但是在参数化查询的过程中，语句是语句，参数是参数，参数的值不会被当作语句的一部分执行。</p>
+<p>以下以PHP下的参数化查询作为例子。</p>
+<p>常规查询功能示例。此时如果<code>$username</code>和<code>$password</code>两个参数是可控的情况下，就可能会造成被插入恶意SQL语句的情况：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 构造SQL查询</span></span><br><span class="line"><span class="variable">$sql</span> = <span class="string">&quot;SELECT * FROM users WHERE username = &#x27;<span class="subst">$username</span>&#x27; AND password = &#x27;<span class="subst">$password</span>&#x27;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">query</span>(<span class="variable">$sql</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>PDO参数化查询示例。对SQL语句进行预编译，而后绑定参数，将输入和SQL模版分离：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 预编译SQL语句</span></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">prepare</span>(<span class="string">&#x27;SELECT * FROM users WHERE username = :username AND password = :password&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 绑定参数</span></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:username&#x27;</span>, <span class="variable">$username</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:password&#x27;</span>, <span class="variable">$password</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置输入</span></span><br><span class="line"><span class="variable">$username</span> = <span class="string">&#x27;admin&#x27;</span>;</span><br><span class="line"><span class="variable">$password</span> = <span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行查询</span></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">execute</span>();</span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">fetchAll</span>();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="模拟预处理（假预编译）"><a href="#模拟预处理（假预编译）" class="headerlink" title="模拟预处理（假预编译）"></a>模拟预处理（假预编译）</h2><p>为了能看到后续进行预编译的时候，数据库执行SQL语句的过程，我们需要先开启日志：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> variables <span class="keyword">like</span> <span class="string">&#x27;general%&#x27;</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="keyword">GLOBAL</span> general_log <span class="operator">=</span> <span class="keyword">ON</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217025952222.png" alt="image-20241217025952222"></p>
+<p>测试环境：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$host</span> = <span class="string">&quot;localhost&quot;</span>;</span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line"><span class="variable">$user</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$pass</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="keyword">new</span> <span class="title function_ invoke__">PDO</span>(<span class="string">&quot;mysql:host=<span class="subst">$host</span>;dbname=<span class="subst">$dbname</span>&quot;</span>, <span class="variable">$user</span>, <span class="variable">$pass</span>);</span><br><span class="line"><span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">setAttribute</span>(PDO::<span class="variable constant_">ATTR_ERRMODE</span>, PDO::<span class="variable constant_">ERRMODE_EXCEPTION</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">prepare</span>(<span class="string">&quot;select username from user where id = :id&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$username</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;id&#x27;</span>];</span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:id&#x27;</span>, <span class="variable">$username</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">execute</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">fetchAll</span>(PDO::<span class="variable constant_">FETCH_ASSOC</span>);</span><br><span class="line"><span class="title function_ invoke__">print_r</span>(<span class="variable">$result</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="title function_ invoke__">show_source</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>传入一个<code>id=1</code>，然后查看日志过程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2024-12-16T19:10:51.394325Z	   13 Connect	root@localhost on test using Socket</span><br><span class="line">2024-12-16T19:10:51.394679Z	   13 Query	select username from user where username = &#x27;1&#x27;</span><br><span class="line">2024-12-16T19:10:51.396014Z	   13 Quit	</span><br></pre></td></tr></table></figure>
+
+<p>从日志中可以看到，第一步是<strong>链接数据库</strong>，第二步就是<strong>执行SQL语句</strong>，第三步为<strong>退出</strong>。但是这和之前提到的预编译的过程不一样，接下来再尝试一下存在符号的语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?id=1&#x27;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2024-12-17T02:41:46.570293Z	    6 Connect	root@localhost on test using Socket</span><br><span class="line">2024-12-17T02:41:46.570626Z	    6 Query	select username from user where id = &#x27;1\&#x27;&#x27;</span><br><span class="line">2024-12-17T02:41:46.571404Z	    6 Quit	</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，果然就是草台班子，我们输入的符号只不过是被转义了而已，并不是被标榜的参数化查询。但是真的是这样吗，这是因为默认的预编译模式，被称作<strong>虚假的预编译（模拟预处理机制）</strong>，他在执行SQL语句的时候，没有执行所谓的预编译、参数绑定等过程，仅仅是对·我们输入的符号进行了转移。</p>
+<p>那为什么这是一个虚假的预编译呢，这是由于参数<code>PDO::ATTR_EMULATE_PREPARES</code>，该选项用来配置PDO是否使用<strong>模拟预编译</strong>，也就是虚假的预编译，这个开关默认情况下为<code>true</code>，设置为<code>false</code>后，才会执行真正的预编译的过程。设置这个开关的目的是为了兼容一些不支持预编译操作的数据库（如sqllite和低版本的MySQL），模拟预编译会由<strong>客户端</strong>程序内部参数绑定这一过程（而不是数据库），内部prepare后再将拼接的sql语句发给数据库来执行。</p>
+<h2 id="真预编译"><a href="#真预编译" class="headerlink" title="真预编译"></a>真预编译</h2><p>接下来，在原有的代码的基础上，加一个将<code>PDO::ATTR_EMULATE_PREPARES</code>设置为<code>false</code>的操作：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">setAttribute</span>(PDO::<span class="variable constant_">ATTR_EMULATE_PREPARES</span>, <span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+
+<p>再执行数据库语句，得到日志内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">024-12-17T06:00:02.191209Z	   11 Connect	root@localhost on test using Socket</span><br><span class="line">2024-12-17T06:00:02.193765Z	   11 Prepare	select username from user where id = ?</span><br><span class="line">2024-12-17T06:00:02.195767Z	   11 Execute	select username from user where id = &#x27;1&#x27;</span><br><span class="line">2024-12-17T06:00:02.197243Z	   11 Close stmt	</span><br><span class="line">2024-12-17T06:00:02.197333Z	   11 Quit	</span><br></pre></td></tr></table></figure>
+
+<p>从日志内容中可以看到，执行的顺序变成了：</p>
+<ol>
+<li>连接数据库</li>
+<li>预编译</li>
+<li>绑定参数并查询</li>
+<li>关闭连接与退出</li>
+</ol>
+<p>在预编译步骤，我们预留的绑定参数的部分，可以看到被<code>&#39;?&#39;</code>作为占位符放置，在执行阶段才绑定了用户输入的参数，并执行SQL语句。此时在预编译部分，整个SQL语句的整体就已经被固定，也就消除了用户输入的内容中存在SQL语句的歧义。</p>
+<p>预编译的设计初衷并不是用来防止SQL注入的危害，而是为了提高MySQL的运行效率，因为它可以先构建语法树再绑定参数进行执行，避免了每次执行都需要构建语法树的繁琐，可以在面对大量的查询时保持较高的运行效率。虚假的预编译的PDO会在客户端（PHP脚本所在的环境）对SQL语句进行一些处理，而不是完全的依赖数据库的处理功能，这意味着会为服务器带来更多的资源节省，但同时增加了被攻击的风险。真的预编译当然能更好的防护住SQL注入的危害，但我们一定不排除大部分开发人员仍然会使用默认配置，或为了节省服务器开销而使用虚假的预编译的情况。</p>
+<h2 id="报错注入为什么会被执行"><a href="#报错注入为什么会被执行" class="headerlink" title="报错注入为什么会被执行"></a>报错注入为什么会被执行</h2><p>回到开头所说的报错注入能拿到<code>user()</code>和<code>database()</code>，但是其他子查询语句没办法拿到数据的情况。看了P神的文章解释为：</p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>非模拟预处理的情况下，参数化绑定过程分两步：第一步是prepare阶段，发送带有占位符的sql语句到mysql服务器（parsing-&gt;resolution），第二步是多次发送占位符参数给mysql服务器进行执行（多次执行optimization-&gt;execution）。</p>
+<p>这时，假设在第一步执行<code>prepare($SQL)</code>的时候我的SQL语句就出现错误了，那么就会直接由mysql那边抛出异常，不会再执行第二步。</p>
+</blockquote>
+<p>在xsheep给分享的站下，此处使用报错注入的payload，是可以通过报错注入拿到<code>user()</code>和<code>database()</code>执行的结果的，但是当我继续使用子查询查表名列名的时候，却一直显示<code>Invalid parameter number</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">payload：<span class="number">123</span><span class="string">&#x27;)) and updatexml(1,concat(0x7e,(select group_concat(table_name) </span></span><br><span class="line"><span class="string">from information_schema.tables </span></span><br><span class="line"><span class="string">where table_schema=database()),0x7e),1)--+-</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241214234154984.png" alt="image-20241214234154984"></p>
+<p>是因为预编译中的参数，如果是一个SQL语句，那么在执行绑定参数的步骤时，会出现以上错误。但是这就能确保预编译后完全安全了吗，在有些位置也是不可以参数化的：</p>
+<ol>
+<li>表名、列名</li>
+<li>order by、group by</li>
+<li>limit</li>
+<li>join</li>
+<li>……</li>
+</ol>
+<p>是由于，类似order by之类的语句，后续接的内容时是字段，而在编写sql的时候，字段名是不能带引号的，一旦带了引号就会被视为字符串，如果order by后的内容是字符串的话，就会出现语法错误。不止是order by，凡是字符串但是又不能加引号的位置都不能参数化。</p>
+<p>那么为什么user()和database()数据库函数还是被执行呢，应该是因为预编译是在mysql服务端进行的，预编译的过程不会接触数据，所以使用子查询的情况下不会触发报错，但虽然预编译的过程不接触数据，user()等数据库函数的值还是会被编译进SQL语句，所以会被显示出来。（引用P神的猜测）</p>
+<h2 id="预编译下的SQL注入"><a href="#预编译下的SQL注入" class="headerlink" title="预编译下的SQL注入"></a>预编译下的SQL注入</h2><p>复现<a target="_blank" rel="noopener" href="https://fushuling.com/">狗and猫</a>师傅的过程，给佬磕一个！</p>
+<h3 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h3><p>从模拟预编译的执行方式来看，他只是普通的加上了反斜杠进行转义，可以想到SQL注入中的宽字节注入，宽字节注入存在的条件就是，服务端处理用户输入时使用的编码和数据库解析的编码（需使用宽字节编码，如GBK、GB2312等）不同，并且服务端对输入的特殊字符进行了转义。通常，UTF-8中单个字符由1-4个字节表示，宽字节编码中的汉字可以使用两个字节表示。在GBK编码的数据库中，%5c(反斜杠)和某些合法字节组合在一起时，会被解释成一个合法的双字节字符，就可以绕过反斜杠的转义效果。</p>
+<p>例如，输入的内容为<code>%df&#39; OR &#39;1&#39;=&#39;1</code>，在服务端会将输入的单引号转义为<code>\&#39;</code>，但是在数据库端处理输入的内容时，<code>%5c和%df就会结合成</code>  <code>%df%5c</code>，会被数据库解释成一个汉字，因此语句最终就会变成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27;合法字符&#x27; OR &#x27;1&#x27;=&#x27;1</span><br></pre></td></tr></table></figure>
+
+<p>由此看来，此时是有存在宽字节注入的可能性的，设置环境进行测试</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$username</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;username&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="variable">$db</span> = <span class="keyword">new</span> <span class="title function_ invoke__">PDO</span>(<span class="string">&quot;mysql:host=localhost;dbname=test;charset=gbk&quot;</span>, <span class="string">&quot;root&quot;</span>, <span class="string">&quot;root&quot;</span>);</span><br><span class="line"><span class="variable">$db</span> -&gt; <span class="title function_ invoke__">setAttribute</span>(PDO::<span class="variable constant_">ATTR_EMULATE_PREPARES</span>, <span class="literal">false</span>);</span><br><span class="line"><span class="variable">$db</span>-&gt;<span class="title function_ invoke__">query</span>(<span class="string">&#x27;SET NAMES GBK&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$db</span>-&gt;<span class="title function_ invoke__">prepare</span>(<span class="string">&quot;SELECT password FROM user where username= :username&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:username&#x27;</span>, <span class="variable">$username</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">execute</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">fetchAll</span>(PDO::<span class="variable constant_">FETCH_ASSOC</span>);</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(<span class="variable">$result</span>);</span><br><span class="line"><span class="variable">$db</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在<strong>使用模拟预处理</strong>时，pyaload为<code>1%df%27%20union%20select%20database();#</code>时，SQL语句会变成：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> password <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">where</span> username<span class="operator">=</span> <span class="string">&#x27;1\運&#x27;</span> <span class="keyword">union</span> <span class="keyword">select</span> database();#<span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>也就使SQL注入成为了可能。</p>
+<p>如果<strong>未开启模拟预处理</strong>，则日志内容为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2024-12-17T07:42:04.421662Z	   20 Prepare	SELECT password FROM user where username= ?</span><br><span class="line">2024-12-17T07:42:04.421708Z	   20 Execute	SELECT password FROM user where username= 0x616C696365DF27</span><br><span class="line">2024-12-17T07:42:04.421858Z	   20 Close stmt	</span><br><span class="line">2024-12-17T07:42:04.421892Z	   20 Quit</span><br></pre></td></tr></table></figure>
+
+<p>可以看到其中插入的参数被hex编码了，这是因为我们服务端设置了编码时，就会将绑定的参数进行编码，因此真预编译对SQL注入的防护还是较为给力的。</p>
+<h3 id="未进行参数绑定的预编译"><a href="#未进行参数绑定的预编译" class="headerlink" title="未进行参数绑定的预编译"></a>未进行参数绑定的预编译</h3><p><strong>没有进行参数绑定的预编译等于没有预编译</strong>，无论是真编译还是模拟预编译，如果使用预编译语句时没有进行参数绑定，而是直接将用户输入的内容拼接到SQL查询中，那么久失去了预编译的安全性，等同于没有使用预编译，也就无法起到语句和参数分离的作用。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$host</span> = <span class="string">&quot;localhost&quot;</span>;</span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line"><span class="variable">$user</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$pass</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$params</span> = [</span><br><span class="line">    PDO::<span class="variable constant_">ATTR_EMULATE_PREPARES</span>  =&gt; <span class="literal">true</span></span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="variable">$id</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;id&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="keyword">new</span> <span class="title function_ invoke__">PDO</span>(<span class="string">&quot;mysql:host=<span class="subst">$host</span>;dbname=<span class="subst">$dbname</span>&quot;</span>, <span class="variable">$user</span>, <span class="variable">$pass</span>, <span class="variable">$params</span>);</span><br><span class="line"><span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">setAttribute</span>(PDO::<span class="variable constant_">ATTR_ERRMODE</span>, PDO::<span class="variable constant_">ERRMODE_EXCEPTION</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">prepare</span>(<span class="string">&quot;select username from user where id = <span class="subst">$id</span>&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">execute</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">fetchAll</span>(PDO::<span class="variable constant_">FETCH_ASSOC</span>);</span><br><span class="line"><span class="title function_ invoke__">print_r</span>(<span class="variable">$result</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="title function_ invoke__">show_source</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>以上是<strong>开启了模拟预编</strong>的情况，可以看到，将用户输入的id直接写到了预处理的SQL语句中，此时虽然也对数据库语句进行了prepare操作进行了预处理，但是也起不到作用，并且PDO默认支持<strong>堆叠注入</strong>，我们也可以插入自己的SQL语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=1;select database();</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2024-12-17T08:43:48.569297Z	   28 Connect	root@localhost on test using Socket</span><br><span class="line">2024-12-17T08:43:48.569563Z	   28 Query	select username from user where id = 1;</span><br><span class="line">2024-12-17T08:43:48.569904Z	   28 Query	select database()</span><br><span class="line">2024-12-17T08:43:48.570233Z	   28 Quit	</span><br></pre></td></tr></table></figure>
+
+<p>从日志中看，由于我们没有执行绑定参数的操作，因此并不存在预处理的步骤，并且，我通过堆叠注入插入的<code>database()</code>也被正确执行了。</p>
+<p>关闭模拟预处理后，再进行尝试：</p>
+<p>此时再执行同样的payload语句，发现出现了报错，就无法进行堆叠注入了，但是看到其他师傅测试时，即使关闭了模拟预处理也是能够执行堆叠注入的，猜测可能是我的MySQL版本相对较高导致的，因此可以作为一个测试点，万一目标站点服务版本支持呢。</p>
+<h3 id="无法预编译的位置"><a href="#无法预编译的位置" class="headerlink" title="无法预编译的位置"></a>无法预编译的位置</h3><p>前面有说到，有些地方是不能被参数化的，<strong>因此遇到可控的排序功能时，是我们进行SQL注入测试时的一个重点</strong>。</p>
+<p>都知道，<code>oder by</code>、<code>group by</code>等等一些语句后，加入的内容不能是字符串（通常可能为列名），而参数化就是把我们输入的内容通过绑定参数的步骤绑定字符串到预编译好的SQL语句中，以下构造环境测试：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$host</span> = <span class="string">&quot;localhost&quot;</span>;</span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line"><span class="variable">$user</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$pass</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$params</span> = [</span><br><span class="line">    PDO::<span class="variable constant_">ATTR_EMULATE_PREPARES</span>  =&gt; <span class="literal">false</span></span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="variable">$col</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;col&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="keyword">new</span> <span class="title function_ invoke__">PDO</span>(<span class="string">&quot;mysql:host=<span class="subst">$host</span>;dbname=<span class="subst">$dbname</span>&quot;</span>, <span class="variable">$user</span>, <span class="variable">$pass</span>, <span class="variable">$params</span>);</span><br><span class="line"><span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">setAttribute</span>(PDO::<span class="variable constant_">ATTR_ERRMODE</span>, PDO::<span class="variable constant_">ERRMODE_EXCEPTION</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">prepare</span>(<span class="string">&quot;select * from user order by :col&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:col&#x27;</span>, <span class="variable">$col</span>, PDO::<span class="variable constant_">PARAM_STR</span>); </span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">execute</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">fetchAll</span>(PDO::<span class="variable constant_">FETCH_ASSOC</span>);</span><br><span class="line"><span class="title function_ invoke__">print_r</span>(<span class="variable">$result</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="title function_ invoke__">show_source</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>此时，如果我想指定通过按照id列进行排序时：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2024-12-17T09:18:56.759432Z	   38 Connect	root@localhost on test using Socket</span><br><span class="line">2024-12-17T09:18:56.760556Z	   38 Prepare	select * from user order by ?</span><br><span class="line">2024-12-17T09:18:56.760722Z	   38 Execute	select * from user order by &#x27;id&#x27;</span><br><span class="line">2024-12-17T09:18:56.761679Z	   38 Close stmt	</span><br><span class="line">2024-12-17T09:18:56.761744Z	   38 Quit	</span><br></pre></td></tr></table></figure>
+
+<p>可以看到其中id同样被当作了字符串进行处理，因此我的语句中的order by id并没有按照我预想的功能实现。数据库中，如果数据库的索引失败，查询结果就会等同于oder by NULL或者oder by TRUE，本质上不是一条合法的请求。以下是直接在数据库中做的测试，可看到oder by后为字符串和为NULL的结果都相同：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172254481.png" alt="image-20241217172254481"></p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172339843.png" alt="image-20241217172339843"></p>
+<p>那么，遇到order by 等一系列后面不可参数化的查询语句时，如何进行SQL注入呢，可以通过构造类似布尔盲注的情况进行：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172723615.png" alt="image-20241217172723615"></p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172756167.png" alt="image-20241217172756167"></p>
+<p>可以看到，当<code>rand(true)</code>和<code>rand(false)</code>时查询出来的内容回显是不同的，因此可以利用这个点进行盲注，构造payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user ORDER BY rand(ASCII(mid((select DATABASE()),1 ,1))&gt;96);</span><br></pre></td></tr></table></figure>
+
+<p>除了oder by、group by等以外，from等可以利用：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181805258.png" alt="image-20241217181805258"></p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181823619.png" alt="image-20241217181823619"></p>
+<p>select 后也可以</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181902526.png" alt="image-20241217181902526"></p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181920905.png" alt="image-20241217181920905"></p>
+<p>limit后：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181958311.png" alt="image-20241217181958311"></p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182032803.png" alt="image-20241217182032803"></p>
+<p>Join:</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182658142.png" alt="image-20241217182658142"></p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182713839.png" alt="image-20241217182713839"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总之，针对预编译的SQL注入主要就在于，无法添加引号的位置就无法进行参数化绑定，进而也无法执行预编译，这也导致了oder by、group by等使用的场景成为了SQL注入的薄弱点。</p>
+<h3 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h3><ol>
+<li>白名单验证：在后段对传入的参数进行验证，只允许指定的合法字段进入SQL查询，避免用户输入敏感语句。</li>
+<li>间接对象引用：通过前段传递映射编号而非字段名，后段根据编号与预设的字段映射关系执行查询，避免用户直接传入SQL字段。</li>
+<li>合理配置框架：对于MyBatis等框架中必须使用${}拼接参数的情况，开发时应将输入控制在白名单范围内。</li>
+</ol>
+<p>写完这篇文章后，发现xsheep师傅分享的站点关闭了，也没有办法去再复现，后续如果再遇到类似的情况，在实际场景中尝试一下。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://fushuling.com/index.php/2023/10/27/%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8Esql%E6%B3%A8%E5%85%A5/">https://fushuling.com/index.php/2023/10/27/预编译与sql注入/</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lsdb/p/12084038.html">https://www.cnblogs.com/lsdb/p/12084038.html</a><br><a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/thinkphp5-in-sqlinjection.html">https://www.leavesongs.com/PENETRATION/thinkphp5-in-sqlinjection.html</a><br><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/10839?time__1311=CqjxRDcGeeqDqGXYkDIE4RhiCtDtDnGBx2YD&u_atoken=d4eb856adbc1fc67dd3072937d7cefa7&u_asig=1a0c399817340574489158966e003e">https://xz.aliyun.com/t/10839?time__1311=CqjxRDcGeeqDqGXYkDIE4RhiCtDtDnGBx2YD&amp;u_atoken=d4eb856adbc1fc67dd3072937d7cefa7&amp;u_asig=1a0c399817340574489158966e003e</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.github.io">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.github.io/posts/10372.html">https://yosheep.github.io/posts/10372.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.github.io" target="_blank">YoSheep's 学习笔记</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/WEB/">WEB</a><a class="post-meta__tags" href="/tags/SQL%E6%B3%A8%E5%85%A5/">SQL注入</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/6245f930.html" title="大模型提示词---Prompt Engineering（提示工程）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">大模型提示词---Prompt Engineering（提示工程）</div></div></a></div><div class="next-post pull-right"><a href="/posts/63987.html" title="逆向学习(3)---IDA的使用和实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">逆向学习(3)---IDA的使用和实践</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/cb3612fa.html" title="SQL注入---常见分类攻击方式总结与绕过"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-06-28</div><div class="title">SQL注入---常见分类攻击方式总结与绕过</div></div></a></div><div><a href="/posts/837881d6.html" title="CVE-2024-9047复现及成因分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-27</div><div class="title">CVE-2024-9047复现及成因分析</div></div></a></div><div><a href="/posts/14897.html" title="HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-10</div><div class="title">HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？</div></div></a></div><div><a href="/posts/17013.html" title="PHP反序列化"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-18</div><div class="title">PHP反序列化</div></div></a></div><div><a href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-22</div><div class="title">Java安全学习(1)-Java反序列化基础</div></div></a></div><div><a href="/posts/691d1762.html" title="RCE之常见绕过方式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-21</div><div class="title">RCE之常见绕过方式</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="toc-number">1.</span> <span class="toc-text">写在前面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E5%8C%96%E6%9F%A5%E8%AF%A2"><span class="toc-number">2.</span> <span class="toc-text">参数化查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F%E9%A2%84%E5%A4%84%E7%90%86%EF%BC%88%E5%81%87%E9%A2%84%E7%BC%96%E8%AF%91%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">模拟预处理（假预编译）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9C%9F%E9%A2%84%E7%BC%96%E8%AF%91"><span class="toc-number">4.</span> <span class="toc-text">真预编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E8%A2%AB%E6%89%A7%E8%A1%8C"><span class="toc-number">5.</span> <span class="toc-text">报错注入为什么会被执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8B%E7%9A%84SQL%E6%B3%A8%E5%85%A5"><span class="toc-number">6.</span> <span class="toc-text">预编译下的SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-number">6.1.</span> <span class="toc-text">宽字节注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AA%E8%BF%9B%E8%A1%8C%E5%8F%82%E6%95%B0%E7%BB%91%E5%AE%9A%E7%9A%84%E9%A2%84%E7%BC%96%E8%AF%91"><span class="toc-number">6.2.</span> <span class="toc-text">未进行参数绑定的预编译</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E6%B3%95%E9%A2%84%E7%BC%96%E8%AF%91%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-number">6.3.</span> <span class="toc-text">无法预编译的位置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B2%E5%BE%A1"><span class="toc-number">7.1.</span> <span class="toc-text">防御</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">8.</span> <span class="toc-text">参考</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础">Java安全学习(1)-Java反序列化基础</a><time datetime="2025-08-22T14:47:19.000Z" title="发表于 2025-08-22 22:47:19">2025-08-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/12b7d7b4.html" title="Python Pickle 反序列化漏洞">Python Pickle 反序列化漏洞</a><time datetime="2025-08-12T06:46:34.000Z" title="发表于 2025-08-12 14:46:34">2025-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/16f3418.html" title="安卓开发基础学习">安卓开发基础学习</a><time datetime="2025-08-09T15:16:12.000Z" title="发表于 2025-08-09 23:16:12">2025-08-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/37862da4.html" title="跨站脚本攻击-XSS">跨站脚本攻击-XSS</a><time datetime="2025-07-19T04:56:24.000Z" title="发表于 2025-07-19 12:56:24">2025-07-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/cb3612fa.html" title="SQL注入---常见分类攻击方式总结与绕过">SQL注入---常见分类攻击方式总结与绕过</a><time datetime="2025-06-28T03:31:33.000Z" title="发表于 2025-06-28 11:31:33">2025-06-28</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2025 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
+      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
+      avatar: 'monsterid',
+      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

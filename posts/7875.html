@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>逆向学习(2)---分析实践 | YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="刚学习编程时，是从C语言的HelloWorld开始的，那么此处就也从HelloWorld开始分析吧，其中引出了C语言中的调用约定的学习。 还是那个Hello World使用C编写一个输出HelloWorld的简单程序： 12345#include&lt;stdio.h&gt;int main() &#123;    printf(&quot;Hello, World!\n&quot;);&amp;#125">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向学习(2)---分析实践">
+<meta property="og:url" content="https://yosheep.github.io/posts/7875.html">
+<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
+<meta property="og:description" content="刚学习编程时，是从C语言的HelloWorld开始的，那么此处就也从HelloWorld开始分析吧，其中引出了C语言中的调用约定的学习。 还是那个Hello World使用C编写一个输出HelloWorld的简单程序： 12345#include&lt;stdio.h&gt;int main() &#123;    printf(&quot;Hello, World!\n&quot;);&amp;#125">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yosheep.github.io/img/yeah_circle.jpg">
+<meta property="article:published_time" content="2024-12-07T05:22:15.000Z">
+<meta property="article:modified_time" content="2024-12-12T08:19:27.342Z">
+<meta property="article:author" content="YoSheep">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yosheep.github.io/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.github.io/posts/7875.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '逆向学习(2)---分析实践',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-12-12 16:19:27'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap.xml"><i class="fa-fw fa fa-sitemap"></i><span> sitemap</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap.xml"><i class="fa-fw fa fa-sitemap"></i><span> sitemap</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">逆向学习(2)---分析实践</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-07T05:22:15.000Z" title="发表于 2024-12-07 13:22:15">2024-12-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-12T08:19:27.342Z" title="更新于 2024-12-12 16:19:27">2024-12-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%80%86%E5%90%91/">逆向</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.2k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="逆向学习(2)---分析实践"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/7875.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/7875.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>刚学习编程时，是从C语言的HelloWorld开始的，那么此处就也从HelloWorld开始分析吧，其中引出了C语言中的调用约定的学习。</p>
+<h2 id="还是那个Hello-World"><a href="#还是那个Hello-World" class="headerlink" title="还是那个Hello World"></a>还是那个Hello World</h2><p>使用C编写一个输出HelloWorld的简单程序：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Hello, World!\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将其打包为一个可执行程序，并使用IDA打开：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241206133107979.png" alt="image-20241206133107979"></p>
+<p>可以看到IDA将程序中的机器码转换为了汇编语言的形式。</p>
+<p>在IDA显示的内容中，发现除了接触过的汇编语言以外，还存在：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">; <span class="type">int</span> __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br></pre></td></tr></table></figure>
+
+<p>递归学习一下</p>
+<h2 id="C语言的调用约定（Calling-Convention）"><a href="#C语言的调用约定（Calling-Convention）" class="headerlink" title="C语言的调用约定（Calling Convention）"></a>C语言的调用约定（Calling Convention）</h2><p>在C语言中，有不同的调用约定，用来定义函数如何调用、参数如何传递以及栈的清理方式。它们的主要区别如下：</p>
+<h4 id="cdecl（C-Declaration）"><a href="#cdecl（C-Declaration）" class="headerlink" title="__cdecl（C Declaration）"></a>__cdecl（C Declaration）</h4><p><strong>特点：</strong></p>
+<ol>
+<li>C的<strong>默认</strong>约定。</li>
+<li>参数<strong>从右到左</strong>依次压入栈。</li>
+<li>返回值通常存储在寄存器（x86:EAX；ARM64: X0）。</li>
+<li>支持可变参数（如printf，<strong>参数数量不固定</strong>的函数）。</li>
+<li>由<strong>调用者负责清理栈</strong>（由<strong>调用函数的一方（Caller）</strong>负责将函数参数在栈上的空间清理掉，而不是由被调用函数（Callee）完成）。</li>
+</ol>
+<h4 id="stdcall（Standard-Call）"><a href="#stdcall（Standard-Call）" class="headerlink" title="__stdcall（Standard Call）"></a>__stdcall（Standard Call）</h4><p><strong>特点：</strong></p>
+<ol>
+<li>参数<strong>由右到左</strong>依次压入栈。</li>
+<li>由<strong>被调用者负责清理栈</strong>（Callee负责清空栈上的参数）。</li>
+<li>常用于Windows API函数。</li>
+<li>不支持可变参数（函数参数需固定）。</li>
+</ol>
+<h4 id="fastcall（Fast-Call）"><a href="#fastcall（Fast-Call）" class="headerlink" title="__fastcall（Fast Call）"></a>__fastcall（Fast Call）</h4><p><strong>特点：</strong></p>
+<ol>
+<li>尽量使用<strong>寄存器传递</strong>函数参数，未用完的参数通过<strong>栈传递</strong>（前几个参数使用寄存器传递，剩余参数<strong>从右到左</strong>压栈）。</li>
+<li>由<strong>被调用者负责清理栈</strong>（Callee负责清空栈上的参数）。</li>
+<li>适用于<strong>性能敏感</strong>的场景，因为寄存器比内存（栈）访问速度快。</li>
+<li>在x86平台中，ECX和EDX寄存器用于传递前两个参数，其余参数依旧压栈；在ARM64架构下，通常前几个参数使用寄存器（如X0、X1等），后续参数用栈传递。</li>
+</ol>
+<h4 id="压栈顺序示例："><a href="#压栈顺序示例：" class="headerlink" title="压栈顺序示例："></a>压栈顺序示例：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sum</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span>;</span><br><span class="line">sum(<span class="number">3</span>, <span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>从右到左</strong>堆栈调用流程：</p>
+<ol>
+<li>b 压栈；</li>
+<li>a 压栈；</li>
+<li>函数返回后，调用者&#x2F;被调用者清理栈。</li>
+</ol>
+<p><strong>从左到右</strong>堆栈调用流程：</p>
+<ol>
+<li>a 压栈；</li>
+<li>b 压栈；</li>
+<li>函数返回后，调用者&#x2F;被调用者清理栈。</li>
+</ol>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><table>
+<thead>
+<tr>
+<th>调用约定</th>
+<th>参数传递方式</th>
+<th>栈清理责任</th>
+<th>支持变长参数</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>__cdecl</td>
+<td>参数从右到左压栈</td>
+<td>调用者</td>
+<td>支持</td>
+<td>适合跨平台通用性强的C语言代码</td>
+</tr>
+<tr>
+<td>__stdcall</td>
+<td>参数从右到左压栈</td>
+<td>被调用者</td>
+<td>不支持</td>
+<td>用于特定平台（Windows）上的调用规范</td>
+</tr>
+<tr>
+<td>__fastcall</td>
+<td>参数通过寄存器+栈传递</td>
+<td>被调用者</td>
+<td>不支持</td>
+<td>优化性能，适合性能敏感的场景</td>
+</tr>
+</tbody></table>
+<h2 id="回到HelloWorld"><a href="#回到HelloWorld" class="headerlink" title="回到HelloWorld"></a>回到HelloWorld</h2><h3 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h3><p>在ARM64中，函数调用涉及两大关键组件：</p>
+<ol>
+<li><strong>寄存器</strong>：用来存储数据、传递参数或保存返回值。</li>
+</ol>
+<p>​	•X0~X30：通用寄存器，主要用来存储整数、指针、返回值等。</p>
+<p>​	•SP：栈指针，指向当前栈的顶端。</p>
+<p>​	•X29：帧指针，标记栈帧的基址，便于访问局部变量和返回地址。</p>
+<p>​	•X30：链接寄存器，用来保存函数调用的返回地址。</p>
+<ol start="2">
+<li><strong>栈</strong>：用于存储函数的局部变量和寄存器的备份。栈的操作遵循 <strong>“向下增长”</strong>（ARM64栈的地址递减）。</li>
+</ol>
+<h3 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h3><p>以下代码展示了一个简单的函数调用过程，其中 main 函数负责调用 printf 输出 Hello, World!，并返回 0。</p>
+<p>首先从寄存器特征和起始的<code>AREA __test, CODE</code>可以看出来，我的主机是arm架构的，<code>ORG 0x100003F6C</code>表示的是指定段的起始位置。</p>
+<p>IDA反编译出来的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">; Segment type: Pure code</span><br><span class="line">AREA __text, CODE</span><br><span class="line">; ORG 0x100003F6C</span><br><span class="line">CODE64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">; Attributes: bp-based frame</span><br><span class="line"></span><br><span class="line">; int __fastcall main(int argc, const char **argv, const char **envp)</span><br><span class="line">EXPORT _main</span><br><span class="line">_main</span><br><span class="line"></span><br><span class="line">var_s0=  0</span><br><span class="line">var_s8=  8</span><br><span class="line"></span><br><span class="line">STP             X29, X30, [SP,#-0x10+var_s0]!</span><br><span class="line">MOV             X29, SP</span><br><span class="line">ADRL            X0, aHelloWorld ; &quot;Hello, World!\n&quot;</span><br><span class="line">BL              _printf</span><br><span class="line">MOV             W0, #0</span><br><span class="line">LDP             X29, X30, [SP+var_s0],#0x10</span><br><span class="line">RET</span><br><span class="line">; End of function _main</span><br><span class="line"></span><br><span class="line">; __text ends</span><br></pre></td></tr></table></figure>
+
+<h4 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a><strong>函数声明</strong></h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">; int __fastcall main(int argc, const char **argv, const char **envp)</span><br></pre></td></tr></table></figure>
+
+<p>此处表明main函数使用了__fastcall调用约定。</p>
+<h4 id="内容分解"><a href="#内容分解" class="headerlink" title="内容分解"></a><strong>内容分解</strong></h4><p><strong>1.栈帧的创建</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STP             X29, X30, [SP,#-0x10+var_s0]!</span><br></pre></td></tr></table></figure>
+
+<p><strong>分解说明</strong>：</p>
+<p>（1）STP <strong>指令</strong>：同时存储两个寄存器的值到内存。</p>
+<p>（2）将 X29（帧指针）和 X30（链接寄存器，保存返回地址）压入栈中。</p>
+<p>（3）栈指针 SP 递减 0x10（16字节）以分配新的栈空间，同时更新 SP 的值。</p>
+<p><strong>作用</strong>：</p>
+<p>（1）保护当前函数的调用环境，避免寄存器被覆盖。</p>
+<p>（2）创建栈帧，用于存储局部变量和保存上下文。</p>
+<p><strong>示意图</strong>（执行后栈的变化）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">低地址 ┌───────────┐</span><br><span class="line">        │   X30    │  &lt;- 保存的返回地址</span><br><span class="line">        ├───────────┤</span><br><span class="line">        │   X29    │  &lt;- 保存的帧指针</span><br><span class="line">高地址 └───────────┘ &lt;- SP（栈指针）</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV             X29, SP</span><br></pre></td></tr></table></figure>
+
+<p><strong>分解说明</strong>：</p>
+<p>（1）MOV <strong>指令</strong>：将一个值复制到寄存器。</p>
+<p>（2）将栈指针 SP 的值复制到帧指针 X29。</p>
+<p><strong>作用</strong>：更新帧指针 X29，使其指向当前函数的栈帧。现在 X29 指向当前栈帧的顶部，方便访问局部变量和返回地址。</p>
+<p><strong>2. 函数调用</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADRL            X0, aHelloWorld ; &quot;Hello, World!\n&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>分解说明</strong>：</p>
+<p>（1）ADRL <strong>指令</strong>：加载一个全局变量的地址。</p>
+<p>（2）将字符串 “Hello, World!\n” 的地址加载到寄存器 X0 中。</p>
+<p><strong>作用</strong>：ARM64调用约定规定，第一个参数通过 X0 寄存器传递。此时，printf 函数将接收 X0 作为它的第一个参数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BL              _printf</span><br></pre></td></tr></table></figure>
+
+<p><strong>分解说明</strong>：</p>
+<p>（1）BL <strong>指令</strong>：跳转到 _printf 的地址，并保存当前返回地址到 X30。</p>
+<p>（2）执行 _printf 函数，输出字符串。</p>
+<p><strong>作用</strong>：将控制权交给 printf 函数，同时保存返回地址以便后续恢复。</p>
+<p><strong>过程</strong>：printf 会根据寄存器的值（X0），找到 “Hello, World!\n” 并打印。</p>
+<p><strong>3. 返回值处理</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MOV             W0, #0</span><br></pre></td></tr></table></figure>
+
+<p><strong>分解说明</strong>：</p>
+<p>（1）MOV <strong>指令</strong>：将立即数 0 加载到 W0。</p>
+<p>（2）ARM64调用约定规定，整数返回值存储在 X0（或低32位的 W0）。</p>
+<p><strong>作用</strong>：准备返回值 0，表示程序成功执行。</p>
+<p><strong>4. 栈帧的销毁与返回</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDP             X29, X30, [SP+var_s0],#0x10</span><br></pre></td></tr></table></figure>
+
+<p><strong>分解说明</strong>：</p>
+<p>（1）LDP <strong>指令</strong>：从栈中加载两个寄存器的值。</p>
+<p>（2）恢复 X29（帧指针）和 X30（返回地址）。</p>
+<p>（3）同时释放栈空间，更新 SP。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RET</span><br></pre></td></tr></table></figure>
+
+<p><strong>分解说明</strong>：从 X30 中取出返回地址，并跳转到该地址继续执行。</p>
+<p><strong>作用</strong>：恢复调用者环境，返回到调用 main 的位置。</p>
+<blockquote>
+<p>[!NOTE]</p>
+<ol>
+<li>在ARM64平台中函数的前几个参数通过寄存器（X0～X7）传递，之后的再通过栈传递，所以此处printf函数的第一个参数也就是X0（此时加载字符串”Hello…”的地址）。</li>
+<li>在ARM64平台中，当执行跳转指令（如BL、BLR）时，CPU会自动将跳转后应返回的位置（即当前指令的下一条指令地址）保存到X30。</li>
+<li>在ARM64平台的调用约定中，函数的返回值为整数时默认存储在X0或W0寄存器（取决于返回值是64位(X0)还是32位(W0)），返回值为浮点类型时存储在V0（浮点寄存器），如果返回值体积较大，超出了寄存器的存储能力时，会通过栈传递。</li>
+<li>当全部内容执行完毕后，使用RET指令，从X30中取出返回地址，恢复到调用main的位置继续执行。</li>
+<li>开头为什么<strong>偏移 -0x10</strong>？ARM64 的栈通常以16字节对齐，因此这里分配16字节（0x10），确保对齐的同时提供足够的空间存储两个64位寄存器（X29 和 X30 每个占8字节）。</li>
+</ol>
+</blockquote>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><p>自从在大学上完汇编的课之后，好像确实没有什么实际的使用和研究，虽然学到了汇编的基本语法和指令集，也大致理解了计算机如何与硬件互动，但随着学业的推进，更多的课程开始专注于高级语言的应用，汇编似乎逐渐被遗忘了。回想起来，曾经有过一段时间觉得这些底层知识不太重要，可能是由于一直在倾向web方面内容的学习，没有太过于注重底层的原理，重新学习后发现，汇编不仅是工具，更是一种深入理解计算机运行的思维方式。</p>
+<p>确实这次会感觉重新学习这些知识比较难，不仅是回忆之前学过的，也有一些课程没有接触过的东西，虽然只是过了个最简单的HelloWorld的程序，但那种重新理解底层运作的感觉还是挺震撼的。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.github.io">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.github.io/posts/7875.html">https://yosheep.github.io/posts/7875.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.github.io" target="_blank">YoSheep's 学习笔记</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E9%80%86%E5%90%91/">逆向</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/14897.html" title="HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？</div></div></a></div><div class="next-post pull-right"><a href="/posts/30761.html" title="逆向学习(1)---基础知识"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">逆向学习(1)---基础知识</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/63987.html" title="逆向学习(3)---IDA的使用和实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-12</div><div class="title">逆向学习(3)---IDA的使用和实践</div></div></a></div><div><a href="/posts/30761.html" title="逆向学习(1)---基础知识"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-06</div><div class="title">逆向学习(1)---基础知识</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%98%E6%98%AF%E9%82%A3%E4%B8%AAHello-World"><span class="toc-number">1.</span> <span class="toc-text">还是那个Hello World</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#C%E8%AF%AD%E8%A8%80%E7%9A%84%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A%EF%BC%88Calling-Convention%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">C语言的调用约定（Calling Convention）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cdecl%EF%BC%88C-Declaration%EF%BC%89"><span class="toc-number">2.0.1.</span> <span class="toc-text">__cdecl（C Declaration）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#stdcall%EF%BC%88Standard-Call%EF%BC%89"><span class="toc-number">2.0.2.</span> <span class="toc-text">__stdcall（Standard Call）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fastcall%EF%BC%88Fast-Call%EF%BC%89"><span class="toc-number">2.0.3.</span> <span class="toc-text">__fastcall（Fast Call）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%8B%E6%A0%88%E9%A1%BA%E5%BA%8F%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">2.0.4.</span> <span class="toc-text">压栈顺序示例：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.0.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E5%88%B0HelloWorld"><span class="toc-number">3.</span> <span class="toc-text">回到HelloWorld</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">3.1.</span> <span class="toc-text">基础知识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90"><span class="toc-number">3.2.</span> <span class="toc-text">程序分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E"><span class="toc-number">3.2.1.</span> <span class="toc-text">函数声明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AE%B9%E5%88%86%E8%A7%A3"><span class="toc-number">3.2.2.</span> <span class="toc-text">内容分解</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93-1"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础">Java安全学习(1)-Java反序列化基础</a><time datetime="2025-08-22T14:47:19.000Z" title="发表于 2025-08-22 22:47:19">2025-08-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/12b7d7b4.html" title="Python Pickle 反序列化漏洞">Python Pickle 反序列化漏洞</a><time datetime="2025-08-12T06:46:34.000Z" title="发表于 2025-08-12 14:46:34">2025-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/16f3418.html" title="安卓开发基础学习">安卓开发基础学习</a><time datetime="2025-08-09T15:16:12.000Z" title="发表于 2025-08-09 23:16:12">2025-08-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/37862da4.html" title="跨站脚本攻击-XSS">跨站脚本攻击-XSS</a><time datetime="2025-07-19T04:56:24.000Z" title="发表于 2025-07-19 12:56:24">2025-07-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/cb3612fa.html" title="SQL注入---常见分类攻击方式总结与绕过">SQL注入---常见分类攻击方式总结与绕过</a><time datetime="2025-06-28T03:31:33.000Z" title="发表于 2025-06-28 11:31:33">2025-06-28</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2025 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
+      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
+      avatar: 'monsterid',
+      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

