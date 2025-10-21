@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MCP（Model Context Protocol）学习笔记：下一代LLM接口标准 | YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="近几年，大模型的发展速度实在太快了。 从最初单纯依赖 Prompt 的阶段，到后来兴起的 AI Agent，再到如今的 MCP（Model Context Protocol），每一次演进都在重塑人们与模型交互的方式。AI Agent 还在半年前是人人讨论的热门话题，如今却随着 MCP 的出现，逐渐淡出了视野。 为了跟上时代的脚步，我决定深入学习 MCP，通过本篇记录下自己的理解过程，并思考它在安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MCP（Model Context Protocol）学习笔记：下一代LLM接口标准">
+<meta property="og:url" content="https://yosheep.github.io/posts/8bcf35ec.html">
+<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
+<meta property="og:description" content="近几年，大模型的发展速度实在太快了。 从最初单纯依赖 Prompt 的阶段，到后来兴起的 AI Agent，再到如今的 MCP（Model Context Protocol），每一次演进都在重塑人们与模型交互的方式。AI Agent 还在半年前是人人讨论的热门话题，如今却随着 MCP 的出现，逐渐淡出了视野。 为了跟上时代的脚步，我决定深入学习 MCP，通过本篇记录下自己的理解过程，并思考它在安全">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yosheep.github.io/img/yeah_circle.jpg">
+<meta property="article:published_time" content="2025-10-20T09:28:04.000Z">
+<meta property="article:modified_time" content="2025-10-21T01:30:54.806Z">
+<meta property="article:author" content="YoSheep">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="MCP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yosheep.github.io/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.github.io/posts/8bcf35ec.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MCP（Model Context Protocol）学习笔记：下一代LLM接口标准',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-10-21 12:30:54'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">MCP（Model Context Protocol）学习笔记：下一代LLM接口标准</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-20T09:28:04.000Z" title="发表于 2025-10-20 20:28:04">2025-10-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-21T01:30:54.806Z" title="更新于 2025-10-21 12:30:54">2025-10-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI/">AI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.2k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="MCP（Model Context Protocol）学习笔记：下一代LLM接口标准"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/8bcf35ec.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/8bcf35ec.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>近几年，大模型的发展速度实在太快了。 从最初单纯依赖 Prompt 的阶段，到后来兴起的 AI Agent，再到如今的 MCP（Model Context Protocol），每一次演进都在重塑人们与模型交互的方式。AI Agent 还在半年前是人人讨论的热门话题，如今却随着 MCP 的出现，逐渐淡出了视野。</p>
+<p>为了跟上时代的脚步，我决定深入学习 MCP，通过本篇记录下自己的理解过程，并思考它在安全性与安全应用场景上可能带来的新变化。</p>
+<h1 id="1-Prompt，Agent，MCP都是什么"><a href="#1-Prompt，Agent，MCP都是什么" class="headerlink" title="1 Prompt，Agent，MCP都是什么"></a>1 Prompt，Agent，MCP都是什么</h1><h2 id="1-1-Prompt"><a href="#1-1-Prompt" class="headerlink" title="1.1 Prompt"></a>1.1 Prompt</h2><p>2023 年，OpenAI 发布了 ChatGPT。当时的 AI 主要以聊天框的形式存在，我们输入的消息被称为 <strong>User Prompt</strong>，即用户提示词，通常是我们提出的问题或指令。</p>
+<p>实际上，通过不同的提示词，用户可以在一定程度上塑造AI 的性格。例如：</p>
+<p>- 当你说：“帮我修改我的论文。”  </p>
+<p> AI 会以助理的口吻给出中立的建议；  </p>
+<p>- 而如果你说：“假设你是我的导师，请帮我修改论文。”  </p>
+<p> 它的语气可能会更加犀利、批判性更强（bushi）。</p>
+<p>在这种情况下，AI 的“性格”信息其实混在了 <code>User Prompt</code> 中。但在更标准的设计中，这类信息应当放在 <strong>System Prompt</strong> 中，它通常包含模型的角色、语气、背景信息等。每次我们发送 <code>User Prompt</code> 时，系统都会连同 <code>System Prompt</code> 一起发送。</p>
+<p>在 ChatGPT 的 <strong>GPTs</strong> 功能中也有类似机制。它会根据对话自动生成该自定义模型的性格与背景设定，当然也可以由用户自行配置，例如偏好、语气风格等：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20251020205330099.png" alt="image-20251020205330099"></p>
+<p>然而，从根本上看，Prompt 仍然只是“对话”层面的交互。AI 可以提供建议与引导，但具体执行任务的仍然是人类。那么，是否有办法让 AI 能够 <strong>自主执行任务</strong> 呢？这便引出了 <strong>AI Agent</strong> 的概念。</p>
+<p>顺带一提，我之前也系统学习并在实习中应用过一些 Prompt Engineering 的内容，感兴趣的师傅可以参考我之前的博客文章：<a href="https://yosheep.github.io/posts/6245f930.html">《大模型提示词 — Prompt Engineering》</a>。</p>
+<h2 id="1-2-AI-Agent"><a href="#1-2-AI-Agent" class="headerlink" title="1.2 AI Agent"></a>1.2 AI Agent</h2><p>在传统的 Prompt 阶段，AI 就像一个顾问，只能通过语言给出建议，却无法真正“动手”。而在 Agent 出现后，AI 拥有了一套可以使用外部工具的体系。</p>
+<p>可以这样理解：</p>
+<ul>
+<li>系统提供了一整套 “工具箱”（Toolbox），里面有各种功能接口，比如浏览网页、执行代码、查询数据库、发送邮件等。</li>
+<li>而 AI Agent 就像是一个懂得使用工具的助手。它不仅知道有哪些工具，还知道什么时候、怎么使用它们。</li>
+<li>当我们给 AI 一个目标，比如“帮我查一下今天悉尼的天气并发邮件告诉我”，AI 并不是自己去“幻想”结果，而是会指挥 Agent 去调用“天气查询工具”和“邮件发送工具”，完成整套任务流程。</li>
+</ul>
+<p>示意图：</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20251020211836647.png" alt="image-20251020211836647"></p>
+<p>换句话说，Prompt 告诉 AI 要做什么，而 Agent 让 AI 真的能去做。</p>
+<p>在 Agent 的运行机制中，每个工具通常会被定义成一个标准化的结构。系统会维护一个<strong>工具描述库（Tool Registry）</strong>，其中包含每个工具的名称、功能描述以及参数类型等元信息。  </p>
+<p>例如，一个用于发送邮件的工具可能会被定义为：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;email_someone&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Send an email to someone&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;str&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;str&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>AI Agent 的出现让模型具备了行动能力，但随着使用场景的增多，也暴露出一些问题。每个框架（如 LangChain、AutoGPT、CrewAI 等）都有自己的一套工具定义方式、调用规范和上下文管理逻辑。这种缺乏标准化的实现，导致了几个痛点：</p>
+<ol>
+<li>工具复用困难：同一个功能（例如“浏览网页”或“执行代码”），在不同框架中需要重复封装。  </li>
+<li>上下文孤立：模型在不同环境间切换（例如从 Web 环境到 IDE 插件）时，无法共享上下文信息。  </li>
+<li>安全性问题：Agent 调用外部接口时往往缺乏统一的权限约束和通信协议，容易引发数据泄露或越权访问。</li>
+</ol>
+<p>于是，<strong>MCP（Model Context Protocol）</strong> 应运而生。它由 OpenAI 在 2024 年11月提出，目标是为模型与外部环境之间的交互建立一套统一的通信协议层，让任何模型都能以一致的方式访问外部资源、上下文和工具。</p>
+<h2 id="1-3-MCP（Model-Context-Protocol）"><a href="#1-3-MCP（Model-Context-Protocol）" class="headerlink" title="1.3 MCP（Model Context Protocol）"></a>1.3 MCP（Model Context Protocol）</h2><p>可以简单地把 MCP 理解为——让模型与世界交流的语言标准。</p>
+<p>在前面我们提到的 Agent 体系中，每个 Agent 都需要自己维护一套工具定义（Tool Schema），而不同框架之间的定义方式往往不兼容。MCP 的出现正是为了解决这种工具复用与通信标准化的问题。</p>
+<p>为了提升工具的复用性与可扩展性，MCP 将 Agent 中的 Tool 抽象为独立的服务模块，并通过统一的协议进行管理与调用。  </p>
+<p>换句话说，MCP 不再让每个 Agent 自己储备工具，而是通过一个中心化的“工具服务层”进行托管，任何 Agent 都可以通过协议访问这些工具。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20251020213447205.png" alt="image-20251020213447205"></p>
+<p>在 MCP 的架构中：</p>
+<p>- 运行具体工具的服务被称为 <strong>MCP Server</strong>；</p>
+<p>- 负责调用这些服务的 Agent 被称为 <strong>MCP Client</strong>；</p>
+<p>- 而 MCP 协议（Protocol）则定义了两者之间的通信规范，以及 MCP Server 必须提供的接口形式。</p>
+<p>通过这种方式，MCP 实现了模型调用与工具管理的解耦：  </p>
+<p>​	MCP 只负责定义通信与资源管理规则，而不关心 Agent 使用的是哪种模型（GPT、Claude、Gemini 都可以）。  </p>
+<p>因此，MCP 实际上与 AI 模型本身并没有直接关系。它更像是一个底层的协调与通信协议**，用于帮助 Agent 统一管理：可调用的工具（Tools） 、可访问的资源（Resources）  、以及相关的提示词与上下文（Prompts &amp; Contexts）  </p>
+<h1 id="2-为什么选择MCP"><a href="#2-为什么选择MCP" class="headerlink" title="2 为什么选择MCP"></a>2 为什么选择MCP</h1><p>即便是最强大的语言模型，如果无法接入外部世界、获取足够的上下文、工具与数据，其表现往往会受到严重限制。MCP 的设计正是为了解决这一核心瓶颈：它使模型能够以一种标准化、可扩展且安全的方式，接入工具、数据、提示词和上下文。</p>
+<h2 id="2-1-上下文与工具接入为何关键"><a href="#2-1-上下文与工具接入为何关键" class="headerlink" title="2.1 上下文与工具接入为何关键"></a>2.1 上下文与工具接入为何关键</h2><p>在吴恩达（我的神）的 MCP 课程中，强调了两点关键驱动因素：</p>
+<ul>
+<li><strong>工具与数据访问</strong>：模型如果只能“在封闭环境中”作答（仅凭训练内存或提示词），那么它就像一个被限制在房间里的专家，无法去“查看最新资料”、“执行代码”、或“调用外部数据库”来辅助决策。MCP 帮助模型／Agent 打开了通往外部世界的接口。</li>
+<li><strong>上下文维持与灵活切换</strong>：一个实际任务可能跨越多个子步骤、多个资源（例如文件读取、数据库查询、API 联动）。若没有统一机制，模型或 Agent 在切换工具或跳转场景时，上下文可能丢失、工具调用可能重复、冗余逻辑可能爆炸。通过标准化的 Session、Capability、Tool 定义，可以保障上下文连续、调用可靠、结构清晰。</li>
+</ul>
+<p>因此，选择使用 MCP，正是为了从“孤立模型”迈向“连接能力模型”，从“靠提示词孤立作答”迈向“能访问、联动、执行外部资源”的系统化能力。</p>
+<p>其实看到AI大模型这么迅猛的发展，我的身边和网络上时常会看到很多人十分焦虑，说担心自己哪一天会不会就被AI给取代了。但对我来说，这种变化更多带来的是兴奋与期待。大模型的进步让我对未来社会的发展充满好奇，也让我更加确信：技术并不是来夺走人的价值，而是推动人类走向新的可能。我觉得与其去担心自己的能力会被新的技术所取代，不如主动去了解、学习这些技术，选择让自己融入时代的浪潮，而不是去抗拒他们。我一直都觉得AI根本不是威胁，而是帮助我们，让我们变得更强大的助手和伙伴。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.github.io">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.github.io/posts/8bcf35ec.html">https://yosheep.github.io/posts/8bcf35ec.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.github.io" target="_blank">YoSheep's 学习笔记</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/MCP/">MCP</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/6d596838.html" title="NexusCTF Write-Up By YoSheep"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">NexusCTF Write-Up By YoSheep</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/44904.html" title="Pytorch学习"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-09</div><div class="title">Pytorch学习</div></div></a></div><div><a href="/posts/6245f930.html" title="大模型提示词---Prompt Engineering（提示工程）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-18</div><div class="title">大模型提示词---Prompt Engineering（提示工程）</div></div></a></div><div><a href="/posts/7547cd0e.html" title="让AI也懵圈：一次CTF中的对抗样本生成与应用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-10</div><div class="title">让AI也懵圈：一次CTF中的对抗样本生成与应用</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Prompt%EF%BC%8CAgent%EF%BC%8CMCP%E9%83%BD%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text">1 Prompt，Agent，MCP都是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-Prompt"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 Prompt</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-AI-Agent"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 AI Agent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-MCP%EF%BC%88Model-Context-Protocol%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 MCP（Model Context Protocol）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9MCP"><span class="toc-number">2.</span> <span class="toc-text">2 为什么选择MCP</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E5%B7%A5%E5%85%B7%E6%8E%A5%E5%85%A5%E4%B8%BA%E4%BD%95%E5%85%B3%E9%94%AE"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 上下文与工具接入为何关键</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/8bcf35ec.html" title="MCP（Model Context Protocol）学习笔记：下一代LLM接口标准">MCP（Model Context Protocol）学习笔记：下一代LLM接口标准</a><time datetime="2025-10-20T09:28:04.000Z" title="发表于 2025-10-20 20:28:04">2025-10-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/6d596838.html" title="NexusCTF Write-Up By YoSheep">NexusCTF Write-Up By YoSheep</a><time datetime="2025-10-09T13:52:25.000Z" title="发表于 2025-10-10 00:52:25">2025-10-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/4da32f64.html" title="Gap Year Review --- 在路上的一年">Gap Year Review --- 在路上的一年</a><time datetime="2025-09-21T14:18:05.000Z" title="发表于 2025-09-22 00:18:05">2025-09-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/b97f01f6.html" title="Java安全篇(3)-CC链">Java安全篇(3)-CC链</a><time datetime="2025-08-29T06:26:28.000Z" title="发表于 2025-08-29 16:26:28">2025-08-29</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/105b1196.html" title="XML 外部实体注入（XXE）漏洞基本原理">XML 外部实体注入（XXE）漏洞基本原理</a><time datetime="2025-08-24T11:40:38.000Z" title="发表于 2025-08-24 21:40:38">2025-08-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2025 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
+      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
+      avatar: 'monsterid',
+      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

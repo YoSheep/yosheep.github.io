@@ -6,7 +6,7 @@
   <link href="https://yosheep.github.io/atom.xml" rel="self"/>
   
   <link href="https://yosheep.github.io/"/>
-  <updated>2025-10-09T13:53:37.642Z</updated>
+  <updated>2025-10-21T01:30:54.806Z</updated>
   <id>https://yosheep.github.io/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MCP（Model Context Protocol）学习笔记：下一代LLM接口标准</title>
+    <link href="https://yosheep.github.io/posts/8bcf35ec.html"/>
+    <id>https://yosheep.github.io/posts/8bcf35ec.html</id>
+    <published>2025-10-20T09:28:04.000Z</published>
+    <updated>2025-10-21T01:30:54.806Z</updated>
+    
+    <content type="html"><![CDATA[<p>近几年，大模型的发展速度实在太快了。 从最初单纯依赖 Prompt 的阶段，到后来兴起的 AI Agent，再到如今的 MCP（Model Context Protocol），每一次演进都在重塑人们与模型交互的方式。AI Agent 还在半年前是人人讨论的热门话题，如今却随着 MCP 的出现，逐渐淡出了视野。</p><p>为了跟上时代的脚步，我决定深入学习 MCP，通过本篇记录下自己的理解过程，并思考它在安全性与安全应用场景上可能带来的新变化。</p><h1 id="1-Prompt，Agent，MCP都是什么"><a href="#1-Prompt，Agent，MCP都是什么" class="headerlink" title="1 Prompt，Agent，MCP都是什么"></a>1 Prompt，Agent，MCP都是什么</h1><h2 id="1-1-Prompt"><a href="#1-1-Prompt" class="headerlink" title="1.1 Prompt"></a>1.1 Prompt</h2><p>2023 年，OpenAI 发布了 ChatGPT。当时的 AI 主要以聊天框的形式存在，我们输入的消息被称为 <strong>User Prompt</strong>，即用户提示词，通常是我们提出的问题或指令。</p><p>实际上，通过不同的提示词，用户可以在一定程度上塑造AI 的性格。例如：</p><p>- 当你说：“帮我修改我的论文。”  </p><p> AI 会以助理的口吻给出中立的建议；  </p><p>- 而如果你说：“假设你是我的导师，请帮我修改论文。”  </p><p> 它的语气可能会更加犀利、批判性更强（bushi）。</p><p>在这种情况下，AI 的“性格”信息其实混在了 <code>User Prompt</code> 中。但在更标准的设计中，这类信息应当放在 <strong>System Prompt</strong> 中，它通常包含模型的角色、语气、背景信息等。每次我们发送 <code>User Prompt</code> 时，系统都会连同 <code>System Prompt</code> 一起发送。</p><p>在 ChatGPT 的 <strong>GPTs</strong> 功能中也有类似机制。它会根据对话自动生成该自定义模型的性格与背景设定，当然也可以由用户自行配置，例如偏好、语气风格等：</p><p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20251020205330099.png" alt="image-20251020205330099"></p><p>然而，从根本上看，Prompt 仍然只是“对话”层面的交互。AI 可以提供建议与引导，但具体执行任务的仍然是人类。那么，是否有办法让 AI 能够 <strong>自主执行任务</strong> 呢？这便引出了 <strong>AI Agent</strong> 的概念。</p><p>顺带一提，我之前也系统学习并在实习中应用过一些 Prompt Engineering 的内容，感兴趣的师傅可以参考我之前的博客文章：<a href="https://yosheep.github.io/posts/6245f930.html">《大模型提示词 — Prompt Engineering》</a>。</p><h2 id="1-2-AI-Agent"><a href="#1-2-AI-Agent" class="headerlink" title="1.2 AI Agent"></a>1.2 AI Agent</h2><p>在传统的 Prompt 阶段，AI 就像一个顾问，只能通过语言给出建议，却无法真正“动手”。而在 Agent 出现后，AI 拥有了一套可以使用外部工具的体系。</p><p>可以这样理解：</p><ul><li>系统提供了一整套 “工具箱”（Toolbox），里面有各种功能接口，比如浏览网页、执行代码、查询数据库、发送邮件等。</li><li>而 AI Agent 就像是一个懂得使用工具的助手。它不仅知道有哪些工具，还知道什么时候、怎么使用它们。</li><li>当我们给 AI 一个目标，比如“帮我查一下今天悉尼的天气并发邮件告诉我”，AI 并不是自己去“幻想”结果，而是会指挥 Agent 去调用“天气查询工具”和“邮件发送工具”，完成整套任务流程。</li></ul><p>示意图：</p><p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20251020211836647.png" alt="image-20251020211836647"></p><p>换句话说，Prompt 告诉 AI 要做什么，而 Agent 让 AI 真的能去做。</p><p>在 Agent 的运行机制中，每个工具通常会被定义成一个标准化的结构。系统会维护一个<strong>工具描述库（Tool Registry）</strong>，其中包含每个工具的名称、功能描述以及参数类型等元信息。  </p><p>例如，一个用于发送邮件的工具可能会被定义为：</p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;email_someone&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Send an email to someone&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;str&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;str&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure><p>AI Agent 的出现让模型具备了行动能力，但随着使用场景的增多，也暴露出一些问题。每个框架（如 LangChain、AutoGPT、CrewAI 等）都有自己的一套工具定义方式、调用规范和上下文管理逻辑。这种缺乏标准化的实现，导致了几个痛点：</p><ol><li>工具复用困难：同一个功能（例如“浏览网页”或“执行代码”），在不同框架中需要重复封装。  </li><li>上下文孤立：模型在不同环境间切换（例如从 Web 环境到 IDE 插件）时，无法共享上下文信息。  </li><li>安全性问题：Agent 调用外部接口时往往缺乏统一的权限约束和通信协议，容易引发数据泄露或越权访问。</li></ol><p>于是，<strong>MCP（Model Context Protocol）</strong> 应运而生。它由 OpenAI 在 2024 年11月提出，目标是为模型与外部环境之间的交互建立一套统一的通信协议层，让任何模型都能以一致的方式访问外部资源、上下文和工具。</p><h2 id="1-3-MCP（Model-Context-Protocol）"><a href="#1-3-MCP（Model-Context-Protocol）" class="headerlink" title="1.3 MCP（Model Context Protocol）"></a>1.3 MCP（Model Context Protocol）</h2><p>可以简单地把 MCP 理解为——让模型与世界交流的语言标准。</p><p>在前面我们提到的 Agent 体系中，每个 Agent 都需要自己维护一套工具定义（Tool Schema），而不同框架之间的定义方式往往不兼容。MCP 的出现正是为了解决这种工具复用与通信标准化的问题。</p><p>为了提升工具的复用性与可扩展性，MCP 将 Agent 中的 Tool 抽象为独立的服务模块，并通过统一的协议进行管理与调用。  </p><p>换句话说，MCP 不再让每个 Agent 自己储备工具，而是通过一个中心化的“工具服务层”进行托管，任何 Agent 都可以通过协议访问这些工具。</p><p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20251020213447205.png" alt="image-20251020213447205"></p><p>在 MCP 的架构中：</p><p>- 运行具体工具的服务被称为 <strong>MCP Server</strong>；</p><p>- 负责调用这些服务的 Agent 被称为 <strong>MCP Client</strong>；</p><p>- 而 MCP 协议（Protocol）则定义了两者之间的通信规范，以及 MCP Server 必须提供的接口形式。</p><p>通过这种方式，MCP 实现了模型调用与工具管理的解耦：  </p><p>​MCP 只负责定义通信与资源管理规则，而不关心 Agent 使用的是哪种模型（GPT、Claude、Gemini 都可以）。  </p><p>因此，MCP 实际上与 AI 模型本身并没有直接关系。它更像是一个底层的协调与通信协议**，用于帮助 Agent 统一管理：可调用的工具（Tools） 、可访问的资源（Resources）  、以及相关的提示词与上下文（Prompts &amp; Contexts）  </p><h1 id="2-为什么选择MCP"><a href="#2-为什么选择MCP" class="headerlink" title="2 为什么选择MCP"></a>2 为什么选择MCP</h1><p>即便是最强大的语言模型，如果无法接入外部世界、获取足够的上下文、工具与数据，其表现往往会受到严重限制。MCP 的设计正是为了解决这一核心瓶颈：它使模型能够以一种标准化、可扩展且安全的方式，接入工具、数据、提示词和上下文。</p><h2 id="2-1-上下文与工具接入为何关键"><a href="#2-1-上下文与工具接入为何关键" class="headerlink" title="2.1 上下文与工具接入为何关键"></a>2.1 上下文与工具接入为何关键</h2><p>在吴恩达（我的神）的 MCP 课程中，强调了两点关键驱动因素：</p><ul><li><strong>工具与数据访问</strong>：模型如果只能“在封闭环境中”作答（仅凭训练内存或提示词），那么它就像一个被限制在房间里的专家，无法去“查看最新资料”、“执行代码”、或“调用外部数据库”来辅助决策。MCP 帮助模型／Agent 打开了通往外部世界的接口。</li><li><strong>上下文维持与灵活切换</strong>：一个实际任务可能跨越多个子步骤、多个资源（例如文件读取、数据库查询、API 联动）。若没有统一机制，模型或 Agent 在切换工具或跳转场景时，上下文可能丢失、工具调用可能重复、冗余逻辑可能爆炸。通过标准化的 Session、Capability、Tool 定义，可以保障上下文连续、调用可靠、结构清晰。</li></ul><p>因此，选择使用 MCP，正是为了从“孤立模型”迈向“连接能力模型”，从“靠提示词孤立作答”迈向“能访问、联动、执行外部资源”的系统化能力。</p><p>其实看到AI大模型这么迅猛的发展，我的身边和网络上时常会看到很多人十分焦虑，说担心自己哪一天会不会就被AI给取代了。但对我来说，这种变化更多带来的是兴奋与期待。大模型的进步让我对未来社会的发展充满好奇，也让我更加确信：技术并不是来夺走人的价值，而是推动人类走向新的可能。我觉得与其去担心自己的能力会被新的技术所取代，不如主动去了解、学习这些技术，选择让自己融入时代的浪潮，而不是去抗拒他们。我一直都觉得AI根本不是威胁，而是帮助我们，让我们变得更强大的助手和伙伴。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;近几年，大模型的发展速度实在太快了。 从最初单纯依赖 Prompt 的阶段，到后来兴起的 AI Agent，再到如今的 MCP（Model Context Protocol），每一次演进都在重塑人们与模型交互的方式。AI Agent 还在半年前是人人讨论的热门话题，如今却随</summary>
+      
+    
+    
+    
+    <category term="AI" scheme="https://yosheep.github.io/categories/AI/"/>
+    
+    
+    <category term="AI" scheme="https://yosheep.github.io/tags/AI/"/>
+    
+    <category term="MCP" scheme="https://yosheep.github.io/tags/MCP/"/>
+    
+  </entry>
   
   <entry>
     <title>NexusCTF Write-Up By YoSheep</title>
@@ -502,31 +528,6 @@
       
     <summary type="html">&lt;p&gt;刚学习编程时，是从C语言的HelloWorld开始的，那么此处就也从HelloWorld开始分析吧，其中引出了C语言中的调用约定的学习。&lt;/p&gt;
 &lt;h2 id=&quot;还是那个Hello-World&quot;&gt;&lt;a href=&quot;#还是那个Hello-World&quot; class=&quot;heade</summary>
-      
-    
-    
-    
-    <category term="逆向" scheme="https://yosheep.github.io/categories/%E9%80%86%E5%90%91/"/>
-    
-    
-    <category term="逆向" scheme="https://yosheep.github.io/tags/%E9%80%86%E5%90%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>逆向学习(1)---基础知识</title>
-    <link href="https://yosheep.github.io/posts/30761.html"/>
-    <id>https://yosheep.github.io/posts/30761.html</id>
-    <published>2024-12-05T16:00:13.000Z</published>
-    <updated>2024-12-06T05:23:41.956Z</updated>
-    
-    <content type="html"><![CDATA[<p>所谓技多不压身，最近准备抽空学习一些逆向的内容，在拓宽自己的安全知识的同时也多尝试一些新的领域。</p><h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="1-什么是逆向工程"><a href="#1-什么是逆向工程" class="headerlink" title="1. 什么是逆向工程"></a>1. 什么是逆向工程</h3><p>在编写代码时，我们的目标是将源代码转换为可执行程序，而<strong>逆向工程</strong>，顾名思义，就是将编译链接好的程序反过来恢复到<strong>“代码级别”</strong>的内容。这里的“代码级别”指的是程序逻辑的表述形式，而不是完全还原到源代码。原因在于，源代码的编译过程是<strong>不可逆</strong>的，我们无法从编译后的程序中完全恢复出原始源代码。</p><p>逆向工程通常需要借助工具对程序进行<strong>反编译</strong>，将二进制文件转化为<strong>汇编代码</strong>，有时甚至可以进一步恢复成更高级的伪代码。</p><p>像日常用到的一些C\C++程序在经过编译和链接后，程序为机器码，从而可以直接被执行程序的CPU等理解与使用。这类程序我们使用IDA、OD等逆向工具，只能将其中的机器码恢复为汇编代码状态，然后通过读汇编代码来理解程序的运行过程与机制。相比这一类编译运行类的程序，依靠java虚拟机、.NET等运行的程序，由于所生成的字节码（供虚拟机解释运行）仍然具有高度抽象性，所以这类程序的逆向得到的伪代码的可读性更强，有时甚至接近于源码。但是在生成字节码的过程中，<strong>变量名</strong>、<strong>函数名</strong>是<strong>丢失</strong>的，所以伪代码中这些内容都是<strong>随机命名</strong>的，会给代码阅读造成一定的障碍。</p><h3 id="2-编译型与解释型程序"><a href="#2-编译型与解释型程序" class="headerlink" title="2. 编译型与解释型程序"></a>2. 编译型与解释型程序</h3><p><strong>编译型程序</strong>：程序在执行前会被编译成机器语言文件，运行时不需重新翻译，可直接供机器理解与运行，一般这类程序执行效率高，依赖编译器，跨平台性差。例如：C、C++。</p><p><strong>解释型程序</strong>：程序在使用编程语言编写后，不需要编译，以文本的方式存储原始代码，在运行时，通过对应的解释器将其解释成机器码后执行，执行时逐条读取解释每个语句再执行。执行效率较低，具有较强的跨平台性。</p><h3 id="3-可执行文件"><a href="#3-可执行文件" class="headerlink" title="3. 可执行文件"></a>3. 可执行文件</h3><p>常见的可执行文件有<strong>ELF格式</strong>（Linux）和<strong>PE格式</strong>（Windows）：</p><p><strong>ELF文件</strong>（Executable and Linkable Format）：Linux系统中常见的可执行文件格式，包含程序段和数据段的信息。</p><p><strong>PE文件</strong>（Portable Executable）：windows系统中常见的可执行文件格式，包含了代码、资源、导入&#x2F;导出表等信息。</p><p>具体的这两类文件的结构后续专门抽出一些时间来详细分析学习一下。</p><h3 id="4-加密与混淆"><a href="#4-加密与混淆" class="headerlink" title="4. 加密与混淆"></a>4. 加密与混淆</h3><p>在逆向工程中，<strong>加密保护</strong>和<strong>代码混淆</strong>是开发者用来对程序进行保护的两种常见的手段，这些技术的目的主要是为了<strong>增加逆向分析的难度</strong>，用来保护代码逻辑、数据安全或机密。</p><h4 id="代码混淆（Obfuscation）"><a href="#代码混淆（Obfuscation）" class="headerlink" title="代码混淆（Obfuscation）"></a><strong>代码混淆</strong>（Obfuscation）</h4><p>代码混淆在维基百科中的解释为“将计算机程序的源代码或机器代码，转换成功能上等价，但是难于阅读和理解的形式的行为”。混淆后的代码，会讲原本具有明确定义的类名、字段、函数名等专换成无意义的字母&#x2F;符号，这些混淆后的内容对于计算机来说，执行逻辑是正常的，但是对于人来说具有很强的不可读性，进而达到对代码的保护作用。</p><p>有个看到的很好的例子：</p><p>你想去超市买水果，但又不想让人知道，于是你先去买了卫生纸回来，又去了健身房，然后又去超市买了可乐，最后才去超市买了水果。</p><p>这样一来，别人对你的行动目的就不是明确的，需要多次猜测推理才能知道你的目的。代码混淆的逻辑便是如此，代码开发者们为了隐藏目的，会在代码里加入各种多余的垃圾指令和代码，把原来的逻辑拆分成各种怪癖语法，从而达到防破解的目的。</p><h4 id="代码加密（Encryption）"><a href="#代码加密（Encryption）" class="headerlink" title="代码加密（Encryption）"></a>代码加密（Encryption）</h4><p>和混淆相同，加密是保护程序逻辑和数据的另一种手段，其主要目标是通过对代码内容进行加密，避免静态分析工具能够直接读取或修改。加密后的代码在运行时需要被动态解密后才能被执行，也进一步增加了逆向的难度。</p><p>当然加密的方式很多，后续遇到对应加密方法再详细学习。</p><h3 id="5-静态调试与动态调试"><a href="#5-静态调试与动态调试" class="headerlink" title="5.  静态调试与动态调试"></a>5.  静态调试与动态调试</h3><p>若像前面说的那样，仅仅是通过机器码梳理出来的伪代码分析程序运行过程，叫做<strong>静态调试</strong>，而<strong>动态调试</strong>则是让程序”跑”起来，从而帮助我们更直观的观察到程序的运行过程。</p><h4 id="静态调试"><a href="#静态调试" class="headerlink" title="静态调试"></a><strong>静态调试</strong></h4><p><strong>静态调试</strong>指的是在程序不运行的情况下，通过对其二进制文件或反编译后的代码进行分析，以推断程序的逻辑和功能。静态调试是逆向工程的基础步骤，可以在不执行程序的情况下发现潜在的漏洞或分析其行为。</p><p><strong>适用场景</strong>：适用于初步了解程序的结构和逻辑，特别是在程序运行可能带来风险（如恶意软件）时，静态调试是一个安全的分析方式。</p><h4 id="动态调试"><a href="#动态调试" class="headerlink" title="动态调试"></a><strong>动态调试</strong></h4><p><strong>动态调试</strong>是在程序运行的过程中，通过实时观察程序的行为来分析其逻辑和功能。动态调试可以帮助我们更直观地了解程序的执行流程，尤其是在定位复杂问题或验证静态分析结论时具有重要作用。</p><p><strong>适用场景</strong>：动态调试适合需要观察程序运行时的行为，特别是当某些逻辑仅在特定输入下触发时（如条件分支或动态加载的代码）。</p><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/Javachichi/article/details/140484897">https://blog.csdn.net/Javachichi/article/details/140484897</a><br><a href="https://www.dingxiang-inc.com/blog/post/691">https://www.dingxiang-inc.com/blog/post/691</a><br><a href="https://www.cnblogs.com/hed10ne/p/introduction-to-reverse.html">https://www.cnblogs.com/hed10ne/p/introduction-to-reverse.html</a></p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;所谓技多不压身，最近准备抽空学习一些逆向的内容，在拓宽自己的安全知识的同时也多尝试一些新的领域。&lt;/p&gt;
-&lt;h2 id=&quot;基础概念&quot;&gt;&lt;a href=&quot;#基础概念&quot; class=&quot;headerlink&quot; title=&quot;基础概念&quot;&gt;&lt;/a&gt;基础概念&lt;/h2&gt;&lt;h3 id=&quot;1</summary>
       
     
     
