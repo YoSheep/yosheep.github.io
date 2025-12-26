@@ -16,4 +16,3 @@ Disallow: /*.css
 Disallow: /*.js
 
 Sitemap: https://yosheep.github.io/sitemap.xml
-Sitemap: https://yosheep.github.io/baidusitemap.xml
