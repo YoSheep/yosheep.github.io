@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>https://yosheep.github.io/</loc>
+        <loc>https://yosheep.com/</loc>
         <changefreq>daily</changefreq>
         <priority>1</priority>
     </url>
@@ -10,7 +10,7 @@
     
     
     <url>
-        <loc>https://yosheep.github.io/about/</loc>
+        <loc>https://yosheep.com/about/</loc>
         <lastmod>2025-08-23T04:14:07.231Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -19,7 +19,7 @@
     
     
     <url>
-        <loc>https://yosheep.github.io/tags/</loc>
+        <loc>https://yosheep.com/tags/</loc>
         <lastmod>2024-12-11T05:38:41.064Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -28,7 +28,7 @@
     
     
     <url>
-        <loc>https://yosheep.github.io/link/</loc>
+        <loc>https://yosheep.com/link/</loc>
         <lastmod>2024-12-06T01:55:39.038Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -37,7 +37,7 @@
     
     
     <url>
-        <loc>https://yosheep.github.io/categories/</loc>
+        <loc>https://yosheep.com/categories/</loc>
         <lastmod>2024-12-06T01:29:09.379Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>

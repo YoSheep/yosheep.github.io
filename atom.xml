@@ -3,11 +3,11 @@
   <title>YoSheep&#39;s 学习笔记</title>
   
   
-  <link href="https://yosheep.github.io/atom.xml" rel="self"/>
+  <link href="https://yosheep.com/atom.xml" rel="self"/>
   
-  <link href="https://yosheep.github.io/"/>
+  <link href="https://yosheep.com/"/>
   <updated>2025-11-08T06:16:49.654Z</updated>
-  <id>https://yosheep.github.io/</id>
+  <id>https://yosheep.com/</id>
   
   <author>
     <name>YoSheep</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>MCP（Model Context Protocol）学习笔记：下一代LLM接口标准 ｜ 概念部分</title>
-    <link href="https://yosheep.github.io/posts/8bcf35ec.html"/>
-    <id>https://yosheep.github.io/posts/8bcf35ec.html</id>
+    <link href="https://yosheep.com/posts/8bcf35ec.html"/>
+    <id>https://yosheep.com/posts/8bcf35ec.html</id>
     <published>2025-10-20T09:28:04.000Z</published>
     <updated>2025-11-08T06:16:49.654Z</updated>
     
@@ -33,19 +33,19 @@
     
     
     
-    <category term="AI" scheme="https://yosheep.github.io/categories/AI/"/>
+    <category term="AI" scheme="https://yosheep.com/categories/AI/"/>
     
     
-    <category term="AI" scheme="https://yosheep.github.io/tags/AI/"/>
+    <category term="AI" scheme="https://yosheep.com/tags/AI/"/>
     
-    <category term="MCP" scheme="https://yosheep.github.io/tags/MCP/"/>
+    <category term="MCP" scheme="https://yosheep.com/tags/MCP/"/>
     
   </entry>
   
   <entry>
     <title>NexusCTF Write-Up By YoSheep</title>
-    <link href="https://yosheep.github.io/posts/6d596838.html"/>
-    <id>https://yosheep.github.io/posts/6d596838.html</id>
+    <link href="https://yosheep.com/posts/6d596838.html"/>
+    <id>https://yosheep.com/posts/6d596838.html</id>
     <published>2025-10-09T13:52:25.000Z</published>
     <updated>2025-10-09T13:53:37.642Z</updated>
     
@@ -60,14 +60,14 @@
     
     
     
-    <category term="CTF" scheme="https://yosheep.github.io/tags/CTF/"/>
+    <category term="CTF" scheme="https://yosheep.com/tags/CTF/"/>
     
   </entry>
   
   <entry>
     <title>Gap Year Review --- 在路上的一年</title>
-    <link href="https://yosheep.github.io/posts/4da32f64.html"/>
-    <id>https://yosheep.github.io/posts/4da32f64.html</id>
+    <link href="https://yosheep.com/posts/4da32f64.html"/>
+    <id>https://yosheep.com/posts/4da32f64.html</id>
     <published>2025-09-21T14:18:05.000Z</published>
     <updated>2025-09-21T14:23:42.852Z</updated>
     
@@ -82,14 +82,14 @@
     
     
     
-    <category term="碎碎念" scheme="https://yosheep.github.io/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/"/>
+    <category term="碎碎念" scheme="https://yosheep.com/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/"/>
     
   </entry>
   
   <entry>
     <title>Java安全篇(3)-CC链</title>
-    <link href="https://yosheep.github.io/posts/b97f01f6.html"/>
-    <id>https://yosheep.github.io/posts/b97f01f6.html</id>
+    <link href="https://yosheep.com/posts/b97f01f6.html"/>
+    <id>https://yosheep.com/posts/b97f01f6.html</id>
     <published>2025-08-29T06:26:28.000Z</published>
     <updated>2025-10-15T01:40:22.389Z</updated>
     
@@ -104,19 +104,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="JAVA" scheme="https://yosheep.github.io/tags/JAVA/"/>
+    <category term="JAVA" scheme="https://yosheep.com/tags/JAVA/"/>
     
   </entry>
   
   <entry>
     <title>XML 外部实体注入（XXE）漏洞基本原理</title>
-    <link href="https://yosheep.github.io/posts/105b1196.html"/>
-    <id>https://yosheep.github.io/posts/105b1196.html</id>
+    <link href="https://yosheep.com/posts/105b1196.html"/>
+    <id>https://yosheep.com/posts/105b1196.html</id>
     <published>2025-08-24T09:40:38.000Z</published>
     <updated>2025-08-24T16:40:38.216Z</updated>
     
@@ -130,19 +130,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="XXE" scheme="https://yosheep.github.io/tags/XXE/"/>
+    <category term="XXE" scheme="https://yosheep.com/tags/XXE/"/>
     
   </entry>
   
   <entry>
     <title>Java安全篇(2)-ysoserial使用</title>
-    <link href="https://yosheep.github.io/posts/b1433c19.html"/>
-    <id>https://yosheep.github.io/posts/b1433c19.html</id>
+    <link href="https://yosheep.com/posts/b1433c19.html"/>
+    <id>https://yosheep.com/posts/b1433c19.html</id>
     <published>2025-08-23T11:56:54.000Z</published>
     <updated>2025-08-24T20:05:04.678Z</updated>
     
@@ -156,19 +156,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="JAVA" scheme="https://yosheep.github.io/tags/JAVA/"/>
+    <category term="JAVA" scheme="https://yosheep.com/tags/JAVA/"/>
     
   </entry>
   
   <entry>
     <title>Java安全学习(1)-Java反序列化基础</title>
-    <link href="https://yosheep.github.io/posts/affd600b.html"/>
-    <id>https://yosheep.github.io/posts/affd600b.html</id>
+    <link href="https://yosheep.com/posts/affd600b.html"/>
+    <id>https://yosheep.com/posts/affd600b.html</id>
     <published>2025-08-22T12:47:19.000Z</published>
     <updated>2025-08-22T16:57:37.622Z</updated>
     
@@ -183,19 +183,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="JAVA" scheme="https://yosheep.github.io/tags/JAVA/"/>
+    <category term="JAVA" scheme="https://yosheep.com/tags/JAVA/"/>
     
   </entry>
   
   <entry>
     <title>Python Pickle 反序列化漏洞</title>
-    <link href="https://yosheep.github.io/posts/12b7d7b4.html"/>
-    <id>https://yosheep.github.io/posts/12b7d7b4.html</id>
+    <link href="https://yosheep.com/posts/12b7d7b4.html"/>
+    <id>https://yosheep.com/posts/12b7d7b4.html</id>
     <published>2025-08-12T04:46:34.000Z</published>
     <updated>2025-08-28T16:29:38.159Z</updated>
     
@@ -209,19 +209,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="Pickle" scheme="https://yosheep.github.io/tags/Pickle/"/>
+    <category term="Pickle" scheme="https://yosheep.com/tags/Pickle/"/>
     
   </entry>
   
   <entry>
     <title>安卓开发基础学习</title>
-    <link href="https://yosheep.github.io/posts/16f3418.html"/>
-    <id>https://yosheep.github.io/posts/16f3418.html</id>
+    <link href="https://yosheep.com/posts/16f3418.html"/>
+    <id>https://yosheep.com/posts/16f3418.html</id>
     <published>2025-08-09T13:16:12.000Z</published>
     <updated>2025-08-19T02:35:39.308Z</updated>
     
@@ -238,19 +238,19 @@
     
     
     
-    <category term="Android" scheme="https://yosheep.github.io/categories/Android/"/>
+    <category term="Android" scheme="https://yosheep.com/categories/Android/"/>
     
     
-    <category term="Android" scheme="https://yosheep.github.io/tags/Android/"/>
+    <category term="Android" scheme="https://yosheep.com/tags/Android/"/>
     
-    <category term="学习" scheme="https://yosheep.github.io/tags/%E5%AD%A6%E4%B9%A0/"/>
+    <category term="学习" scheme="https://yosheep.com/tags/%E5%AD%A6%E4%B9%A0/"/>
     
   </entry>
   
   <entry>
     <title>跨站脚本攻击-XSS</title>
-    <link href="https://yosheep.github.io/posts/37862da4.html"/>
-    <id>https://yosheep.github.io/posts/37862da4.html</id>
+    <link href="https://yosheep.com/posts/37862da4.html"/>
+    <id>https://yosheep.com/posts/37862da4.html</id>
     <published>2025-07-19T02:56:24.000Z</published>
     <updated>2025-07-19T05:29:12.077Z</updated>
     
@@ -264,19 +264,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="XSS" scheme="https://yosheep.github.io/tags/XSS/"/>
+    <category term="XSS" scheme="https://yosheep.com/tags/XSS/"/>
     
   </entry>
   
   <entry>
     <title>SQL注入---常见分类攻击方式总结与绕过</title>
-    <link href="https://yosheep.github.io/posts/cb3612fa.html"/>
-    <id>https://yosheep.github.io/posts/cb3612fa.html</id>
+    <link href="https://yosheep.com/posts/cb3612fa.html"/>
+    <id>https://yosheep.com/posts/cb3612fa.html</id>
     <published>2025-06-28T01:31:33.000Z</published>
     <updated>2025-06-28T03:39:20.843Z</updated>
     
@@ -291,19 +291,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="SQL注入" scheme="https://yosheep.github.io/tags/SQL%E6%B3%A8%E5%85%A5/"/>
+    <category term="SQL注入" scheme="https://yosheep.com/tags/SQL%E6%B3%A8%E5%85%A5/"/>
     
   </entry>
   
   <entry>
     <title>让AI也懵圈：一次CTF中的对抗样本生成与应用</title>
-    <link href="https://yosheep.github.io/posts/7547cd0e.html"/>
-    <id>https://yosheep.github.io/posts/7547cd0e.html</id>
+    <link href="https://yosheep.com/posts/7547cd0e.html"/>
+    <id>https://yosheep.com/posts/7547cd0e.html</id>
     <published>2025-03-09T14:47:23.000Z</published>
     <updated>2025-03-09T17:49:22.809Z</updated>
     
@@ -317,19 +317,19 @@
     
     
     
-    <category term="AI" scheme="https://yosheep.github.io/categories/AI/"/>
+    <category term="AI" scheme="https://yosheep.com/categories/AI/"/>
     
     
-    <category term="AI" scheme="https://yosheep.github.io/tags/AI/"/>
+    <category term="AI" scheme="https://yosheep.com/tags/AI/"/>
     
-    <category term="对抗样本" scheme="https://yosheep.github.io/tags/%E5%AF%B9%E6%8A%97%E6%A0%B7%E6%9C%AC/"/>
+    <category term="对抗样本" scheme="https://yosheep.com/tags/%E5%AF%B9%E6%8A%97%E6%A0%B7%E6%9C%AC/"/>
     
   </entry>
   
   <entry>
     <title>RCE之无字母数字RCE</title>
-    <link href="https://yosheep.github.io/posts/6157ec5d.html"/>
-    <id>https://yosheep.github.io/posts/6157ec5d.html</id>
+    <link href="https://yosheep.com/posts/6157ec5d.html"/>
+    <id>https://yosheep.com/posts/6157ec5d.html</id>
     <published>2025-01-23T04:52:50.000Z</published>
     <updated>2025-01-24T08:26:37.820Z</updated>
     
@@ -345,19 +345,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="RCE" scheme="https://yosheep.github.io/tags/RCE/"/>
+    <category term="RCE" scheme="https://yosheep.com/tags/RCE/"/>
     
   </entry>
   
   <entry>
     <title>RCE之常见绕过方式</title>
-    <link href="https://yosheep.github.io/posts/691d1762.html"/>
-    <id>https://yosheep.github.io/posts/691d1762.html</id>
+    <link href="https://yosheep.com/posts/691d1762.html"/>
+    <id>https://yosheep.com/posts/691d1762.html</id>
     <published>2025-01-20T22:34:18.000Z</published>
     <updated>2025-01-23T07:53:13.273Z</updated>
     
@@ -373,19 +373,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="RCE" scheme="https://yosheep.github.io/tags/RCE/"/>
+    <category term="RCE" scheme="https://yosheep.com/tags/RCE/"/>
     
   </entry>
   
   <entry>
     <title>CVE-2024-9047复现及成因分析</title>
-    <link href="https://yosheep.github.io/posts/837881d6.html"/>
-    <id>https://yosheep.github.io/posts/837881d6.html</id>
+    <link href="https://yosheep.com/posts/837881d6.html"/>
+    <id>https://yosheep.com/posts/837881d6.html</id>
     <published>2024-12-27T04:48:11.000Z</published>
     <updated>2024-12-27T13:29:09.637Z</updated>
     
@@ -399,19 +399,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="CVE" scheme="https://yosheep.github.io/tags/CVE/"/>
+    <category term="CVE" scheme="https://yosheep.com/tags/CVE/"/>
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
   </entry>
   
   <entry>
     <title>大模型提示词---Prompt Engineering（提示工程）</title>
-    <link href="https://yosheep.github.io/posts/6245f930.html"/>
-    <id>https://yosheep.github.io/posts/6245f930.html</id>
+    <link href="https://yosheep.com/posts/6245f930.html"/>
+    <id>https://yosheep.com/posts/6245f930.html</id>
     <published>2024-12-17T13:14:29.000Z</published>
     <updated>2024-12-21T05:43:22.751Z</updated>
     
@@ -426,21 +426,21 @@
     
     
     
-    <category term="AI" scheme="https://yosheep.github.io/categories/AI/"/>
+    <category term="AI" scheme="https://yosheep.com/categories/AI/"/>
     
     
-    <category term="AI" scheme="https://yosheep.github.io/tags/AI/"/>
+    <category term="AI" scheme="https://yosheep.com/tags/AI/"/>
     
-    <category term="LLM" scheme="https://yosheep.github.io/tags/LLM/"/>
+    <category term="LLM" scheme="https://yosheep.com/tags/LLM/"/>
     
-    <category term="Prompt" scheme="https://yosheep.github.io/tags/Prompt/"/>
+    <category term="Prompt" scheme="https://yosheep.com/tags/Prompt/"/>
     
   </entry>
   
   <entry>
     <title>参数化查询对SQL注入的防护思考---曾经自信的误判</title>
-    <link href="https://yosheep.github.io/posts/10372.html"/>
-    <id>https://yosheep.github.io/posts/10372.html</id>
+    <link href="https://yosheep.com/posts/10372.html"/>
+    <id>https://yosheep.com/posts/10372.html</id>
     <published>2024-12-15T14:24:23.000Z</published>
     <updated>2024-12-18T06:45:34.383Z</updated>
     
@@ -454,19 +454,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="SQL注入" scheme="https://yosheep.github.io/tags/SQL%E6%B3%A8%E5%85%A5/"/>
+    <category term="SQL注入" scheme="https://yosheep.com/tags/SQL%E6%B3%A8%E5%85%A5/"/>
     
   </entry>
   
   <entry>
     <title>逆向学习(3)---IDA的使用和实践</title>
-    <link href="https://yosheep.github.io/posts/63987.html"/>
-    <id>https://yosheep.github.io/posts/63987.html</id>
+    <link href="https://yosheep.com/posts/63987.html"/>
+    <id>https://yosheep.com/posts/63987.html</id>
     <published>2024-12-12T05:06:26.000Z</published>
     <updated>2024-12-12T17:19:16.922Z</updated>
     
@@ -481,17 +481,17 @@
     
     
     
-    <category term="逆向" scheme="https://yosheep.github.io/categories/%E9%80%86%E5%90%91/"/>
+    <category term="逆向" scheme="https://yosheep.com/categories/%E9%80%86%E5%90%91/"/>
     
     
-    <category term="逆向" scheme="https://yosheep.github.io/tags/%E9%80%86%E5%90%91/"/>
+    <category term="逆向" scheme="https://yosheep.com/tags/%E9%80%86%E5%90%91/"/>
     
   </entry>
   
   <entry>
     <title>HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？</title>
-    <link href="https://yosheep.github.io/posts/14897.html"/>
-    <id>https://yosheep.github.io/posts/14897.html</id>
+    <link href="https://yosheep.com/posts/14897.html"/>
+    <id>https://yosheep.com/posts/14897.html</id>
     <published>2024-12-10T03:06:45.000Z</published>
     <updated>2024-12-10T17:08:04.125Z</updated>
     
@@ -505,19 +505,19 @@
     
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/categories/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/categories/WEB/"/>
     
     
-    <category term="WEB" scheme="https://yosheep.github.io/tags/WEB/"/>
+    <category term="WEB" scheme="https://yosheep.com/tags/WEB/"/>
     
-    <category term="网络安全" scheme="https://yosheep.github.io/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/"/>
+    <category term="网络安全" scheme="https://yosheep.com/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/"/>
     
   </entry>
   
   <entry>
     <title>逆向学习(2)---分析实践</title>
-    <link href="https://yosheep.github.io/posts/7875.html"/>
-    <id>https://yosheep.github.io/posts/7875.html</id>
+    <link href="https://yosheep.com/posts/7875.html"/>
+    <id>https://yosheep.com/posts/7875.html</id>
     <published>2024-12-07T02:22:15.000Z</published>
     <updated>2024-12-12T08:19:27.342Z</updated>
     
@@ -532,10 +532,10 @@
     
     
     
-    <category term="逆向" scheme="https://yosheep.github.io/categories/%E9%80%86%E5%90%91/"/>
+    <category term="逆向" scheme="https://yosheep.com/categories/%E9%80%86%E5%90%91/"/>
     
     
-    <category term="逆向" scheme="https://yosheep.github.io/tags/%E9%80%86%E5%90%91/"/>
+    <category term="逆向" scheme="https://yosheep.com/tags/%E9%80%86%E5%90%91/"/>
     
   </entry>
   
