@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://yosheep.com/sitemap.xml
+Sitemap: https://yosheep.com/post-sitemap.xml
+Sitemap: https://yosheep.com/page-sitemap.xml
