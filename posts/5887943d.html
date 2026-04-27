@@ -1,0 +1,249 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【笔记】吴恩达Generative AI with Large Language Models --- Week3 | YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本篇为学习吴恩达DeepLearning.AI平台下《Generatvie AI with Large Language Models》笔记 课程：DeepLearning.AI — Generative AI with Large Language Models 链接：Generative AI with Large Language Models Week 3: Reinforcement l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【笔记】吴恩达Generative AI with Large Language Models --- Week3">
+<meta property="og:url" content="https://yosheep.com/posts/5887943d.html">
+<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
+<meta property="og:description" content="本篇为学习吴恩达DeepLearning.AI平台下《Generatvie AI with Large Language Models》笔记 课程：DeepLearning.AI — Generative AI with Large Language Models 链接：Generative AI with Large Language Models Week 3: Reinforcement l">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yosheep.com/img/yeah_circle.jpg">
+<meta property="article:published_time" content="2026-02-24T03:04:06.000Z">
+<meta property="article:modified_time" content="2026-04-27T11:32:47.472Z">
+<meta property="article:author" content="YoSheep">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yosheep.com/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.com/posts/5887943d.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【笔记】吴恩达Generative AI with Large Language Models --- Week3',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-04-27 21:32:47'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【笔记】吴恩达Generative AI with Large Language Models --- Week3</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-02-24T03:04:06.000Z" title="发表于 2026-02-24 14:04:06">2026-02-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-27T11:32:47.472Z" title="更新于 2026-04-27 21:32:47">2026-04-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI/">AI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.3k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【笔记】吴恩达Generative AI with Large Language Models --- Week3"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/5887943d.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/5887943d.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本篇为学习吴恩达DeepLearning.AI平台下《Generatvie AI with Large Language Models》笔记</p>
+<p>课程：DeepLearning.AI — <em>Generative AI with Large Language Models</em></p>
+<p>链接：<a target="_blank" rel="noopener" href="https://learn.deeplearning.ai/courses/generative-ai-with-llms">Generative AI with Large Language Models</a></p>
+<h1 id="Week-3-Reinforcement-learning-and-LLM-powered-applications"><a href="#Week-3-Reinforcement-learning-and-LLM-powered-applications" class="headerlink" title="Week 3: Reinforcement learning and LLM-powered applications"></a>Week 3: Reinforcement learning and LLM-powered applications</h1><h2 id="Alignment-and-RLHF"><a href="#Alignment-and-RLHF" class="headerlink" title="Alignment and RLHF"></a>Alignment and RLHF</h2><h3 id="Aligning-models-with-human-values"><a href="#Aligning-models-with-human-values" class="headerlink" title="Aligning models with human values"></a>Aligning models with human values</h3><p>通过 instruction fine-tuning 让AI更懂 prompt、回答得更自然。但回答更像人，并不等于回答就一定更好。模型在生成自然语言时，也可能学到互联网上那些不太好的东西，比如攻击性表达、错误信息，甚至有害内容。</p>
+<p>这里引出了 <strong>alignment（对齐）</strong> 的概念。所谓 aligning models with human values，本质上就是让模型生成的内容更符合人的偏好和社会期待，而不是只会“顺着语言概率往下接”。如果一个模型只是说得像人，但给出的回答不有用、不真实，甚至有害，那它其实并没有真正对齐到人类想要的方向。</p>
+<p>这一节的课程还举了三个关于模型behaving badly的例子，第一种是<strong>not helpful</strong>，比如让模型讲一个 knock-knock joke，它却只回了个 “clap clap”，这虽然有点抽象，但不是用户真正想要的答案。第二种是 <strong>not honest</strong>，比如面对已经被证伪的健康建议，模型却一本正经地输出错误答案，看起来很自信，但其实是在误导人。第三种是 <strong>not harmless</strong>，比如用户问怎么去做违法或伤害他人的事情，而模型真的给出可执行的方法，这种输出显然不应该被允许。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/a7d94b78-a91e-464e-a4b9-fa5b15316d10.png" alt="a7d94b78-a91e-464e-a4b9-fa5b15316d10"></p>
+<p>人类想要模型达到的目标通常就可以概括为 3H（Helpful、Honest、Harmless）</p>
+<h3 id="2-Reinforcement-learning-from-human-feedback-RLHF"><a href="#2-Reinforcement-learning-from-human-feedback-RLHF" class="headerlink" title="2. Reinforcement learning from human feedback (RLHF)"></a>2. Reinforcement learning from human feedback (RLHF)</h3><p>这一节开始正式引出 <strong>RLHF</strong>。课程先用 <strong>text summarization</strong> 做例子，也就是即使一个模型已经做过 instruction fine-tuning，它也不一定真的符合人的偏好。比如摘要可能语法没问题，但不够有帮助、不够准确，或者没有抓住人真正关心的重点。所以，RLHF 可以理解成在 instruct fine-tuned model 之上，再加一轮“按人类偏好继续调”的过程，让模型输出更符合我们想要的方向。</p>
+<p>RLHF 的目标不是单纯让模型更会续写，而是让它更接近 <strong>human-aligned</strong>。课程里提到，这种对齐通常体现在几个方向上：让回答更 <strong>helpful</strong>、更 <strong>relevant</strong>，同时尽量 <strong>minimize harm</strong>，避免危险、有毒或者明显不合适的话题。也就是说，模型不只是要“会说”，还要“说得更像人愿意接受的答案”。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260316221645612.png" alt="image-20260316221645612"></p>
+<p>也就是说，先有一个已经做过了instruct fine-tuned 的 LLM，再通过RLHF把它往human-aligned的方向推进一步。</p>
+<p>为了讲清楚 RLHF，课程先补了一个 <strong>reinforcement learning（强化学习）</strong> 的高层框架。强化学习里最核心的东西其实就几个：<br> 有一个 <strong>agent（智能体）</strong>，它在某个 <strong>environment（环境）</strong> 里，根据当前 <strong>state（状态）</strong> 去采取 <strong>action（动作）</strong>，然后得到一个 <strong>reward（奖励）</strong>。智能体会不断试错，通过最大化累计 reward，慢慢学出一个更好的 <strong>policy（策略）</strong>。课程这里用了 tic-tac-toe（也就是井字棋） 做例子，目标是赢棋，环境是棋盘，状态是当前棋局，动作是在某个位置落子，奖励则和你离赢这件事还有多近有关。多次状态和动作连在一起，就是一个 <strong>playout &#x2F; rollout</strong>。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317000756008.png" alt="image-20260317000756008"></p>
+<p>如果把这个框架放到LLM本身上。上图的<strong>Agent</strong>就是LLM本身，<strong>environment</strong>可以看成是目前模型看到的<strong>context window</strong>，<strong>state</strong>就是当前的<strong>上下文内容</strong>，也就是prompt加上已经生成出来的文本，<strong>action</strong>是模型<strong>接下来要生成的内容</strong>，也就是下一个要生成的token，action space就是整个token vocabulary，而reward，就是这段输出到底有多符合人类偏好。</p>
+<p>这样一套下来，LLM 做文本生成这件事，就可以被看成一个强化学习问题：模型不断在当前上下文下选择下一个 token，形成一整个输出序列，然后系统根据这个输出是否符合 human preferences 给它奖励，模型再根据奖励去更新策略。课程里还提到，在语言建模里，这一整串状态和动作通常叫 <strong>rollout</strong>，而不是经典 RL 里更常说的 playout。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317001234695.png" alt="image-20260317001234695"></p>
+<p>不过这里最大的问题是：<strong>reward 到底从哪来？</strong><br>如果每次都让真人去看模型输出，再打一分，当然最直接，但这件事太慢了，不可能无限扩展。课程里说真人反馈虽然好，但成本高，所以实际做法通常不是让人一直在线打分，而是先收集一部分 <strong>human feedback</strong>，再训练出一个额外的 <strong>reward model</strong>。这个 reward model 学到的是“人更喜欢什么样的回答”，之后它就可以代替人，去给 LLM 的输出打分，输出一个 reward signal。</p>
+<p>所以从流程上看，RLHF 其实可以粗暴地理解成三层东西叠在一起：</p>
+<ol>
+<li>一个已经能正常回答问题的 <strong>instruct LLM</strong></li>
+<li>一个从人类偏好中学出来的 <strong>reward model</strong></li>
+<li>一个用 reward 去继续更新 LLM 的 <strong>reinforcement learning</strong> 过程</li>
+</ol>
+<p>也就是说，人类不会直接参与每一步训练，而是先把偏好“蒸馏”进 reward model，再由 reward model 去持续评价 LLM 的输出。这也是为什么课程最后会说：<strong>reward model 是 RLHF 里的核心部件</strong>，因为它编码了人类偏好，决定了模型后面到底会往什么方向学。</p>
+<h3 id="3-RLHF-Obtaining-feedback-from-humans"><a href="#3-RLHF-Obtaining-feedback-from-humans" class="headerlink" title="3. RLHF: Obtaining feedback from humans"></a>3. RLHF: Obtaining feedback from humans</h3><p>RLHF 的第一步不是马上做强化学习，而是先准备一批 <strong>human feedback</strong> 数据。课程这里提到的做法是，先选一个已经有一定能力的模型，通常比较适合从一个 <strong>instruct model</strong> 开始，因为它至少已经能比较像样地完成任务。然后再配合一个 <strong>prompt dataset</strong>，让模型针对每个 prompt 生成多个不同的 completions。这样做的目的，不是马上选出“唯一正确答案”，而是先造出一组可供比较的候选回答，后面再交给人来判断哪个更符合我们的 alignment 目标。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317020915107.png" alt="image-20260317020915107"></p>
+<p>接下来才进入真正的 <strong>human feedback</strong>。首先要先定义清楚你到底要让人评价什么，也就是 <strong>alignment criterion</strong>。这个标准可以是 <strong>helpfulness</strong>、<strong>harmlessness</strong>、<strong>toxicity</strong>，也可以是别的更具体的目标。也就是说，标注员不是在凭感觉随便选，而是在围绕一个明确标准去排序模型回答。课程里的例子是：prompt 是 <em>“My house is too hot.”</em>，模型生成了三个不同 completions，然后让标注员按 <strong>helpfulness</strong> 从高到低排序。</p>
+<p>在这个例子里，一个比较合理的结果是，那个真正给出可执行建议、比如提到 air conditioning 的回答（黄色的），会被排在第一。而那种没有帮助甚至有点胡说八道的回答，会排在后面。这里很重要的一点是，<strong>human feedback 并不是让人写新答案，而是让人比较模型已经生成出来的答案</strong>。这样做更容易标准化，也更方便后面转成 reward model 的训练数据。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317021651344.png" alt="image-20260317021651344"></p>
+<p>如果<strong>标注说明写得清不清楚，会直接影响 human feedback 的质量</strong>。因为标注员如果没理解任务，或者各自按不同标准排序，那最后得到的数据就会非常混乱。所以实际做法里，通常会给标注员一整套比较详细的 instructions，告诉他们该根据什么来判断、遇到 tie 怎么办、遇到 nonsense 或 irrelevant answer 怎么处理，甚至可以让他们上网 fact-check。这个部分其实很关键，因为 reward model 后面学到的“人类偏好”，本质上就是从这些标注里蒸馏出来的；如果标注本身不稳定，后面整个 RLHF 链条都会有点歪。</p>
+<p>当这些排序数据收集完以后，还不能直接拿去训练 reward model。因为 reward model 更常见的训练形式不是直接学一个“1、2、3 名次”，而是学 <strong>pairwise comparison（成对比较）</strong>。也就是说，要把一个 prompt 下多个 completions 的排序结果，转换成若干个0或1的二元比较样本（两个样本中更好的为1）。</p>
+<p>比如例子为三个 completions，那么从排序结果里可以拆出三组 pair：</p>
+<ul>
+<li>purple vs yellow</li>
+<li>purple vs green</li>
+<li>yellow vs green</li>
+</ul>
+<p>对于每一组 pair，都给 preferred completion 标一个 <strong>1</strong>，另一个标 <strong>0</strong>。同时还要把顺序排好，让更优的那个 completion 放在前面，因为 reward model 训练时默认前面的那个是 preferred response</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317022129843.png" alt="image-20260317022129843"></p>
+<h3 id="4-RLHF-Reward-model"><a href="#4-RLHF-Reward-model" class="headerlink" title="4. RLHF: Reward model"></a>4. RLHF: Reward model</h3><p>前面有说让人在线来对模型的输出进行打分，但是这样效率和成本上都表现极差。因此就需要reward model。它的作用可以简单理解成：<strong>先学会模仿人类偏好，后面再代替人去判断模型回答好不好。</strong></p>
+<p>reward model 本身通常也是一个语言模型，只不过它现在不负责生成回答，而是负责“评分”。训练它的时候，用的正是前一节整理好的 <strong>pairwise comparison data</strong>。对于同一个 prompt <em>x</em>，我们已经知道哪个 completion 是人更喜欢的，哪个是相对没那么好的。reward model 要学的，就是给 preferred completion 更高的 reward，给另一个 completion 更低的 reward。课程里把人类更喜欢的那个记作 <em>y_j</em>，另一个记作 <em>y_k</em>，并且默认 $y_j$ 总是排在前面。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317023638217.png" alt="image-20260317023638217"></p>
+<p>所以 reward model 不是在学“什么是标准答案”，它学的是一种 <strong>preference signal（偏好信号）</strong>。也就是说，它不需要知道一个 completion 绝对对不对，而是要学会判断<strong>在这两个回答里，哪个更符合人类偏好</strong>。这一点很重要，因为 RLHF 关注的本来就不是单纯的事实匹配，而是 helpfulness、harmlessness、honesty 这些更接近“人会怎么选”的东西。</p>
+<p>训练完成以后，reward model 就可以在 RLHF 过程中顶替人类标注员，自动给 LLM 的输出打分。课程里这里用了一个比较直观的例子：如果你的目标是让模型变得更不 toxic，那么 reward model 就可以被训练成一个类似二分类器的东西，去判断一个 completion 更接近 <strong>not hate</strong> 还是 <strong>hate</strong>。但这里真正用来做 reward 的，不是最后硬分类出来的标签，而是模型输出的 <strong>logits</strong>。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317023814416.png" alt="image-20260317023814416"></p>
+<h3 id="5-RLHF-Fine-tuning-with-reinforcement-learning"><a href="#5-RLHF-Fine-tuning-with-reinforcement-learning" class="headerlink" title="5. RLHF: Fine-tuning with reinforcement learning"></a>5. RLHF: Fine-tuning with reinforcement learning</h3><p>前面有说了RLHF所需的两个重要的部分，一个能正常完成任务的 <strong>instruction-fine-tuned LLM</strong>，以及一个从人类偏好数据中训练出来的 <strong>reward model</strong>。怎么用reward model所提供的reward signal来继续更新LLM呢。</p>
+<p>具体流程是一个迭代闭环。先从 <strong>prompt dataset</strong> 中取出一个 prompt，输入当前的 LLM，得到一个 completion。然后把这个 <strong>prompt-completion pair</strong> 送入 reward model，由 reward model 给出一个 reward value。这个分数越高，说明当前回答越符合之前定义的 alignment 目标，比如更 helpful、更 safe，或者更符合人工偏好。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317024710939.png" alt="image-20260317024710939"></p>
+<p>reward model 本身不负责更新 LLM，它只负责打分。真正根据 reward 去修改模型参数的是后面的 <strong>reinforcement learning algorithm</strong>。也就是说，在 RLHF 里，reward model 扮演的是评价器，RL 算法扮演的是优化器：前者告诉系统“这次回答值几分”，后者根据这个分数去调整 LLM，让它以后更倾向于生成高分回答。</p>
+<p>这一轮更新完成后，可以把模型看成一个新的中间版本。然后它继续接收新的 prompt，生成新的 completion，再被 reward model 评分，再继续更新。整个过程会重复很多轮，直到模型在某个评估指标上达到目标，或者训练步数达到预先设定的上限。</p>
+<p>从效果上看，如果训练正常进行，随着迭代继续，模型生成内容对应的 reward 应该逐渐上升。这意味着模型正在学会什么样的回答更符合人类偏好，而不是只按原来的语言分布去续写。到了这个阶段，模型就不只是一个 instruct model，而是一个经过进一步对齐的 <strong>human-aligned LLM</strong>。</p>
+<p>课程里提到，这一步常用的优化算法是 <strong>PPO（Proximal Policy Optimization）</strong>。PPO 负责根据 reward signal 控制参数更新，使模型在提高 reward 的同时，不至于每一步都改得过猛。这里不需要把 PPO 的推导细节全部展开，知道它在 RLHF 里的位置就够了，它是把 reward model 输出的分数真正转化成参数更新的那一层。</p>
+<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20260317024844000.png" alt="image-20260317024844000"></p>
+<h3 id="6-Optional-Proximal-policy-optimization-PPO"><a href="#6-Optional-Proximal-policy-optimization-PPO" class="headerlink" title="6. Optional: Proximal policy optimization (PPO)"></a>6. Optional: Proximal policy optimization (PPO)</h3><h3 id="7-RLHF-Reward-hacking"><a href="#7-RLHF-Reward-hacking" class="headerlink" title="7. RLHF: Reward hacking"></a>7. RLHF: Reward hacking</h3><h3 id="8-KL-divergence"><a href="#8-KL-divergence" class="headerlink" title="8. KL divergence"></a>8. KL divergence</h3><h3 id="9-Scaling-human-feedback"><a href="#9-Scaling-human-feedback" class="headerlink" title="9. Scaling human feedback"></a>9. Scaling human feedback</h3><p>## 3. Deployment<br>### 3.1 Model optimizations for deployment</p>
+<p>## 4. LLM-powered Applications<br>### 4.1 Generative AI Project Lifecycle Cheat Sheet<br>### 4.2 Using the LLM in applications<br>### 4.3 Interacting with external applications</p>
+<p>## 5. Reasoning and Action<br>### 5.1 Helping LLMs reason and plan with chain-of-thought<br>### 5.2 Program-aided language models (PAL)<br>### 5.3 ReAct: Combining reasoning and action<br>### 5.4 ReAct: Reasoning and action</p>
+<p>## 6. LLM Application Architectures<br>### 6.1 LLM application architectures<br>### 6.2 Optional: AWS SageMaker JumpStart</p>
+<p>## 7. Responsible AI</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.com">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.com/posts/5887943d.html">https://yosheep.com/posts/5887943d.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.com" target="_blank">YoSheep's 学习笔记</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/LLM/">LLM</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/2f80a4ab.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week2"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【笔记】吴恩达Generative AI with Large Language Models --- Week2</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/b689f511.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week1"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-21</div><div class="title">【笔记】吴恩达Generative AI with Large Language Models --- Week1</div></div></a></div><div><a href="/posts/6245f930.html" title="大模型提示词---Prompt Engineering（提示工程）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-18</div><div class="title">大模型提示词---Prompt Engineering（提示工程）</div></div></a></div><div><a href="/posts/2f80a4ab.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week2"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-22</div><div class="title">【笔记】吴恩达Generative AI with Large Language Models --- Week2</div></div></a></div><div><a href="/posts/8bcf35ec.html" title="MCP（Model Context Protocol）学习笔记：下一代LLM接口标准 ｜ 概念部分"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-10-20</div><div class="title">MCP（Model Context Protocol）学习笔记：下一代LLM接口标准 ｜ 概念部分</div></div></a></div><div><a href="/posts/44904.html" title="Pytorch学习"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-09</div><div class="title">Pytorch学习</div></div></a></div><div><a href="/posts/7547cd0e.html" title="让AI也懵圈：一次CTF中的对抗样本生成与应用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-10</div><div class="title">让AI也懵圈：一次CTF中的对抗样本生成与应用</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Week-3-Reinforcement-learning-and-LLM-powered-applications"><span class="toc-number">1.</span> <span class="toc-text">Week 3: Reinforcement learning and LLM-powered applications</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Alignment-and-RLHF"><span class="toc-number">1.1.</span> <span class="toc-text">Alignment and RLHF</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Aligning-models-with-human-values"><span class="toc-number">1.1.1.</span> <span class="toc-text">Aligning models with human values</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Reinforcement-learning-from-human-feedback-RLHF"><span class="toc-number">1.1.2.</span> <span class="toc-text">2. Reinforcement learning from human feedback (RLHF)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-RLHF-Obtaining-feedback-from-humans"><span class="toc-number">1.1.3.</span> <span class="toc-text">3. RLHF: Obtaining feedback from humans</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-RLHF-Reward-model"><span class="toc-number">1.1.4.</span> <span class="toc-text">4. RLHF: Reward model</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-RLHF-Fine-tuning-with-reinforcement-learning"><span class="toc-number">1.1.5.</span> <span class="toc-text">5. RLHF: Fine-tuning with reinforcement learning</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-Optional-Proximal-policy-optimization-PPO"><span class="toc-number">1.1.6.</span> <span class="toc-text">6. Optional: Proximal policy optimization (PPO)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-RLHF-Reward-hacking"><span class="toc-number">1.1.7.</span> <span class="toc-text">7. RLHF: Reward hacking</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-KL-divergence"><span class="toc-number">1.1.8.</span> <span class="toc-text">8. KL divergence</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-Scaling-human-feedback"><span class="toc-number">1.1.9.</span> <span class="toc-text">9. Scaling human feedback</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/5887943d.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week3">【笔记】吴恩达Generative AI with Large Language Models --- Week3</a><time datetime="2026-02-24T03:04:06.000Z" title="发表于 2026-02-24 14:04:06">2026-02-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/2f80a4ab.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week2">【笔记】吴恩达Generative AI with Large Language Models --- Week2</a><time datetime="2026-02-22T03:04:06.000Z" title="发表于 2026-02-22 14:04:06">2026-02-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/b689f511.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week1">【笔记】吴恩达Generative AI with Large Language Models --- Week1</a><time datetime="2026-02-21T10:56:25.000Z" title="发表于 2026-02-21 21:56:25">2026-02-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/b80faf69.html" title="React2Shell（CVE-2025-55182）原理拆解">React2Shell（CVE-2025-55182）原理拆解</a><time datetime="2026-01-01T19:00:39.000Z" title="发表于 2026-01-02 06:00:39">2026-01-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/8bcf35ec.html" title="MCP（Model Context Protocol）学习笔记：下一代LLM接口标准 ｜ 概念部分">MCP（Model Context Protocol）学习笔记：下一代LLM接口标准 ｜ 概念部分</a><time datetime="2025-10-20T09:28:04.000Z" title="发表于 2025-10-20 20:28:04">2025-10-20</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2026 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
+      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
+      avatar: 'monsterid',
+      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
