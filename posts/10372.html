@@ -1,161 +1,367 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>参数化查询对SQL注入的防护思考---曾经自信的误判 | YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="写在前面记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿">
-<meta property="og:type" content="article">
-<meta property="og:title" content="参数化查询对SQL注入的防护思考---曾经自信的误判">
-<meta property="og:url" content="https://yosheep.com/posts/10372.html">
-<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
-<meta property="og:description" content="写在前面记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://yosheep.com/img/yeah_circle.jpg">
-<meta property="article:published_time" content="2024-12-15T14:24:23.000Z">
-<meta property="article:modified_time" content="2024-12-18T06:45:34.383Z">
-<meta property="article:author" content="YoSheep">
-<meta property="article:tag" content="WEB">
-<meta property="article:tag" content="SQL注入">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://yosheep.com/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.com/posts/10372.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: '复制成功',
-    error: '复制错误',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
-    buttonText: '加载更多'
-  },
-  isPhotoFigcaption: false,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '参数化查询对SQL注入的防护思考---曾经自信的误判',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: true,
-  postUpdate: '2024-12-18 14:45:34'
-}</script><script>(win=>{
-      win.saveToLocal = {
-        set: (key, value, ttl) => {
-          if (ttl === 0) return
-          const now = Date.now()
-          const expiry = now + ttl * 86400000
-          const item = {
-            value,
-            expiry
-          }
-          localStorage.setItem(key, JSON.stringify(item))
-        },
-      
-        get: key => {
-          const itemStr = localStorage.getItem(key)
-      
-          if (!itemStr) {
-            return undefined
-          }
-          const item = JSON.parse(itemStr)
-          const now = Date.now()
-      
-          if (now > item.expiry) {
-            localStorage.removeItem(key)
-            return undefined
-          }
-          return item.value
-        }
-      }
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="Hexo Theme Keep">
+  <meta name="description" content="欢迎各位师傅交流学习&lt;/br&gt;vx: sunny下划线yosheep">
+  <meta name="author" content="YoSheep">
+  
+  <title>
     
-      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        script.onerror = reject
-        script.onload = script.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          script.onload = script.onreadystatechange = null
-          resolve()
-        }
+      参数化查询对SQL注入的防护思考---曾经自信的误判 |
+    
+    YoSheep&#39;s 学习笔记
+  </title>
+  
+<link rel="stylesheet" href="/css/style.css">
 
-        Object.keys(attr).forEach(key => {
-          script.setAttribute(key, attr[key])
-        })
+  
+    <link rel="shortcut icon" href="/img/favicon.png">
+  
+  
+<link rel="stylesheet" href="/font/css/fontawesome.min.css">
 
-        document.head.appendChild(script)
-      })
-    
-      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onerror = reject
-        link.onload = link.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          link.onload = link.onreadystatechange = null
-          resolve()
-        }
-        document.head.appendChild(link)
-      })
-    
-      win.activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
+  
+<link rel="stylesheet" href="/font/css/regular.min.css">
+
+  
+<link rel="stylesheet" href="/font/css/solid.min.css">
+
+  
+<link rel="stylesheet" href="/font/css/brands.min.css">
+
+  
+  <script>
+    (function () {
+      let theme = localStorage.getItem('KEEP-THEME-STATUS');
+      let classname = "";
+      if (!theme || (JSON.parse(theme).isAutoTheme)){
+        classname = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? "dark-mode" : "light-mode";
       }
-      win.activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
+      else{
+        classname = JSON.parse(theme).isDark ? "dark-mode" : "light-mode";
       }
-      const t = saveToLocal.get('theme')
-    
-        if (t === 'dark') activateDarkMode()
-        else if (t === 'light') activateLightMode()
+      document.documentElement.classList.add(classname);
+    })();
+  </script>
+  <script class="keep-theme-configurations">
+    const KEEP = window.KEEP || {}
+    KEEP.hexo_config = {"hostname":"yosheep.com","root":"/","language":"zh-CN"}
+    KEEP.theme_config = {"base_info":{"primary_color":"#4a7dbe","title":"YoSheep's 学习笔记","author":"YoSheep","avatar":"/img/yeah_circle.jpg","logo":"/img/yeah_circle.jpg","favicon":"/img/favicon.png"},"menu":{"home":"/","archives":"/archives/","categories":"/categories/","tags":"/tags/","links":"/link/","about":"/about/"},"first_screen":{"enable":false,"background_img":"/images/bg.svg","background_img_dark":"/images/bg.svg","description":"Keep writing and Keep loving.","hitokoto":false},"social_contact":{"enable":true,"links":{"github":"https://github.com/yosheep","weixin":null,"qq":null,"weibo":null,"zhihu":null,"twitter":null,"x":null,"facebook":null,"email":"mailto:sunny_cxw@outlook.com"}},"scroll":{"progress_bar":false,"percent":false,"hide_header":true},"home":{"announcement":"佬说：“搞安全的，技术不重要，重要的是要会想。”","category":true,"tag":false,"post_datetime":"created"},"post":{"author_badge":{"enable":false,"level_badge":true,"custom_badge":["One","Two","Three"]},"word_count":{"word":true,"min2read":true},"datetime_format":"YYYY-MM-DD","copyright_info":true,"share":true,"reward":{"enable":false,"img_link":null,"text":null,"icon":null}},"code_block":{"tools":{"enable":true,"style":"default"},"highlight_theme":"default"},"toc":{"enable":true,"number":true,"expand_all":false,"init_open":true,"layout":"right"},"website_count":{"busuanzi_count":{"enable":true,"site_uv":false,"site_pv":false,"page_pv":true}},"local_search":{"enable":true,"preload":false},"comment":{"enable":false,"use":"valine","valine":{"appid":null,"appkey":null,"server_urls":null,"placeholder":null},"gitalk":{"github_id":null,"github_admins":null,"repository":null,"client_id":null,"client_secret":null,"proxy":null},"twikoo":{"env_id":null,"region":null,"version":"2.0.8"},"waline":{"server_url":null,"reaction":false,"version":"3.15.2"},"giscus":{"repo":null,"repo_id":null,"category":"Announcements","category_id":null,"reactions_enabled":false},"artalk":{"server":null},"disqus":{"shortname":null}},"rss":{"enable":true},"lazyload":{"enable":false},"cdn":{"enable":false,"provider":"cdnjs","custom":{"enable":false,"url":null}},"pjax":{"enable":false},"footer":{"since":2023,"word_count":true,"site_deploy":{"enable":false,"provider":"github","url":null},"record":{"enable":false,"list":[{"code":null,"link":null}]}},"inject":{"enable":false,"css":[null],"js":[null]},"root":"","search_db_path":"keep-search.json","source_data":{"links":[{"title":"友情链接"},{"name":"XDLiu","link":"https://liudaxiaxd.github.io/","avatar":"https://liudaxiaxd.github.io/img/kfc0.png","description":"辣个手搓内核的男人"},{"name":"Xsheep","link":"https://xsh11p.github.io/","avatar":"https://zyy0808.github.io/imgs/img/dog.png","description":"一眼ri穿内网"},{"name":"N0va7","link":"https://www.n0va7.cn/","avatar":"https://www.n0va7.cn/avatar.jpg","description":"无限进步"},{"name":"LAT_Dawn","link":"https://www.luminarc.tech/","avatar":"https://www.luminarc.tech/uploads/avatars/avatar_1_84841917-92de-434e-8fad-279822546adbx.jpg","description":"大佬，我们有救了"},{"name":"lrui1","link":"https://lrui1.top/","avatar":"https://lrui1.top/img/avatar.jpg","description":"Java佬带带我"},{"name":"0wnerD1ed","link":"https://0b1t.tech/","avatar":"https://avatars.githubusercontent.com/u/59904423?s=400&u=e2d918cc9959b82599bb4dbfcebb8b912880b9dc&v=4","description":"奶龙奶龙我爱你，就像老鼠爱大米"},{"name":"hongzh0","link":"http://hongzh0.wiki/","avatar":"https://hongzh0.wiki/static-file/88f6fb8b-d64c-44ce…63067a70/c920f187-f6ef-4ddb-bc9d-c8e2f39c18bb.jpg","description":"Hacking Group 0434发起人"}]},"version":"4.4.0"}
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"}
+    KEEP.language_code_block = {"copy":"复制代码","copied":"已复制","fold":"折叠代码块","folded":"已折叠"}
+    KEEP.language_copy_copyright = {"copy":"复制版权信息","copied":"已复制","title":"原文标题","author":"原文作者","link":"原文链接"}
+  </script>
+<meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head>
+
+
+<body>
+<div class="progress-bar-container">
+  
+
+  
+</div>
+
+
+
+<main class="page-container border-box">
+  <!-- home first screen  -->
+  
+
+  <!-- page content -->
+  <div class="page-main-content border-box">
+    <div class="page-main-content-top">
       
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
+<header class="header-wrapper">
+
+  <div class="border-box header-content">
+    <div class="left flex-start border-box">
+      
+        <a class="logo-image border-box" href="/">
+          <img src="/img/yeah_circle.jpg">
+        </a>
+      
+      <a class="site-name border-box" href="/">
+        YoSheep&#39;s 学习笔记
+      </a>
+    </div>
+
+    <div class="right border-box">
+      <div class="pc border-box">
+        <ul class="menu-list border-box">
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/">
+                
+                首页
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/archives/">
+                
+                归档
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/categories/">
+                
+                分类
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/tags/">
+                
+                标签
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/link/">
+                
+                友链
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/about/">
+                
+                关于
+                
+              </a>
+              
+            </li>
+          
+          
+            <li class="menu-item search search-popup-trigger">
+              <i class="menu-text-color fas search fa-search"></i>
+            </li>
+          
+        </ul>
+      </div>
+      <div class="mobile border-box flex-start">
+        
+          <div class="icon-item search search-popup-trigger"><i class="fas fa-search"></i></div>
+        
+        <div class="icon-item menu-bar">
+          <div class="menu-bar-middle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-drawer">
+    <ul class="drawer-menu-list border-box">
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/">
+              
+              首页
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/archives/">
+              
+              归档
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/categories/">
+              
+              分类
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/tags/">
+              
+              标签
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/link/">
+              
+              友链
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/about/">
+              
+              关于
+            </a>
+            
+          </label>
+          
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="window-mask"></div>
+
+</header>
+
+
+    </div>
+
+    <div class="page-main-content-middle border-box">
+
+      <div class="main-content border-box">
+        
+
+          
+<div class="fade-in-down-animation">
+  <div class="post-page-container border-box">
+    <div class="post-content-container border-box">
+      
+
+      <div class="post-content-bottom border-box">
+        
+          <div class="post-title">
+            参数化查询对SQL注入的防护思考---曾经自信的误判
+          </div>
+        
+
+        
+          <div class="post-header border-box">
+            
+              <div class="avatar-box border-box">
+                <img src="/img/yeah_circle.jpg">
+              </div>
+            
+            <div class="info-box">
+              <div class="author border-box">
+                <span class="name">YoSheep</span>
+                
+              </div>
+              <div class="meta-info border-box">
+                
+
+<div class="post-meta-info-container border-box post">
+  <div class="post-meta-info border-box">
     
-      const detectApple = () => {
-        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-          document.documentElement.classList.add('apple')
-        }
-      }
-      detectApple()
-    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
-</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">参数化查询对SQL注入的防护思考---曾经自信的误判</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-15T14:24:23.000Z" title="发表于 2024-12-15 22:24:23">2024-12-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-18T06:45:34.383Z" title="更新于 2024-12-18 14:45:34">2024-12-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/WEB/">WEB</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.4k</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="参数化查询对SQL注入的防护思考---曾经自信的误判"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/posts/10372.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/posts/10372.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿鼓吹。</p>
+
+    
+      <span class="meta-info-item post-create-date">
+        <i class="icon fa-solid fa-calendar-plus"></i>&nbsp;
+        <span class="datetime">2024-12-16</span>
+      </span>
+
+      
+        <span class="meta-info-item post-update-date">
+          <i class="icon fa-solid fa-file-pen"></i>&nbsp;
+          <span class="datetime" data-updated="Wed Dec 18 2024 17:45:34 GMT+1100">2024-12-18</span>
+        </span>
+      
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+      <span class="post-tag meta-info-item border-box">
+        <ul class="post-tag-ul">
+          
+              <li class="tag-item"><span class="tag-separator"><i class="icon fas fa-hashtag"></i></span><a href="/tags/WEB/">WEB</a></li>
+            
+          
+              <li class="tag-item"><span class="tag-separator"><i class="icon fas fa-hashtag"></i></span><a href="/tags/SQL%E6%B3%A8%E5%85%A5/">SQL注入</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+    
+      <span class="meta-info-item post-word-count">
+        <i class="icon fas fa-file-word"></i>&nbsp;<span>4.4k 字</span>
+      </span>
+    
+    
+      <span class="meta-info-item post-min2read">
+        <i class="icon fas fa-clock"></i>&nbsp;<span>17 分钟</span>
+      </span>
+    
+    
+      <span class="meta-info-item post-pv">
+        <i class="icon fas fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+      </span>
+    
+  </div>
+
+  
+</div>
+
+              </div>
+            </div>
+          </div>
+        
+
+        <div class="post-content keep-markdown-body ">
+          
+
+          
+            <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>记得大三的时候，有一门web开发的课程，当时的大作业就是开发一个系统，并且可以自行在其中做上一些安全防护。由于需要实现用户注册、登录、查询等等一系列需要与数据库进行交互的功能，防止SQL注入是很有必要的。当时经过在网上的一顿学习，发现使用PDO参数化查询可以有效防止SQL注入的呼声最高，于是自信满满地大作业里的所有与数据库进行交互了的位置都替换成了参数化查询的方式，并且答辩的时候向老师一顿鼓吹。</p>
 <p>直到前两日，xsheep师傅突然在群里聊到之前尝试挖洞的一个站，通过一个注入点进行报错注入，已经通过<code>database()</code>和<code>user()</code>拿到了回显的情况下，想要再进一步，爆出表名等信息时出现了问题。</p>
 <p>拿到了师傅分享的链接后，我也尝试了半天，确实一直没办法进一步利用，一直重复出现的都是那几个报错，甚至让我一度怀疑我的payload编写的问题。后来了解到，在特定情况下，PDO的预编译，好像真没法完全阻止我们注入的SQL语句。</p>
 <h2 id="参数化查询"><a href="#参数化查询" class="headerlink" title="参数化查询"></a>参数化查询</h2><p>参数化查询是用于数据库操作的一种方法，能够在一定程度上防止SQL注入，其核心主要是<strong>预编译</strong>和<strong>绑定参数</strong>。</p>
@@ -172,7 +378,7 @@
 <h2 id="模拟预处理（假预编译）"><a href="#模拟预处理（假预编译）" class="headerlink" title="模拟预处理（假预编译）"></a>模拟预处理（假预编译）</h2><p>为了能看到后续进行预编译的时候，数据库执行SQL语句的过程，我们需要先开启日志：</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> variables <span class="keyword">like</span> <span class="string">&#x27;general%&#x27;</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="keyword">GLOBAL</span> general_log <span class="operator">=</span> <span class="keyword">ON</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217025952222.png" alt="image-20241217025952222"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217025952222.png"  alt="image-20241217025952222"></p>
 <p>测试环境：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$host</span> = <span class="string">&quot;localhost&quot;</span>;</span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;test&quot;</span>;</span><br><span class="line"><span class="variable">$user</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$pass</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="keyword">new</span> <span class="title function_ invoke__">PDO</span>(<span class="string">&quot;mysql:host=<span class="subst">$host</span>;dbname=<span class="subst">$dbname</span>&quot;</span>, <span class="variable">$user</span>, <span class="variable">$pass</span>);</span><br><span class="line"><span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">setAttribute</span>(PDO::<span class="variable constant_">ATTR_ERRMODE</span>, PDO::<span class="variable constant_">ERRMODE_EXCEPTION</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$pdo</span>-&gt;<span class="title function_ invoke__">prepare</span>(<span class="string">&quot;select username from user where id = :id&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$username</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;id&#x27;</span>];</span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">bindParam</span>(<span class="string">&#x27;:id&#x27;</span>, <span class="variable">$username</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">execute</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;<span class="title function_ invoke__">fetchAll</span>(PDO::<span class="variable constant_">FETCH_ASSOC</span>);</span><br><span class="line"><span class="title function_ invoke__">print_r</span>(<span class="variable">$result</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = <span class="literal">null</span>;</span><br><span class="line"><span class="title function_ invoke__">show_source</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -210,7 +416,7 @@
 <p>在xsheep给分享的站下，此处使用报错注入的payload，是可以通过报错注入拿到<code>user()</code>和<code>database()</code>执行的结果的，但是当我继续使用子查询查表名列名的时候，却一直显示<code>Invalid parameter number</code>：</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">payload：<span class="number">123</span><span class="string">&#x27;)) and updatexml(1,concat(0x7e,(select group_concat(table_name) </span></span><br><span class="line"><span class="string">from information_schema.tables </span></span><br><span class="line"><span class="string">where table_schema=database()),0x7e),1)--+-</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241214234154984.png" alt="image-20241214234154984"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241214234154984.png"  alt="image-20241214234154984"></p>
 <p>是因为预编译中的参数，如果是一个SQL语句，那么在执行绑定参数的步骤时，会出现以上错误。但是这就能确保预编译后完全安全了吗，在有些位置也是不可以参数化的：</p>
 <ol>
 <li>表名、列名</li>
@@ -221,7 +427,7 @@
 </ol>
 <p>是由于，类似order by之类的语句，后续接的内容时是字段，而在编写sql的时候，字段名是不能带引号的，一旦带了引号就会被视为字符串，如果order by后的内容是字符串的话，就会出现语法错误。不止是order by，凡是字符串但是又不能加引号的位置都不能参数化。</p>
 <p>那么为什么user()和database()数据库函数还是被执行呢，应该是因为预编译是在mysql服务端进行的，预编译的过程不会接触数据，所以使用子查询的情况下不会触发报错，但虽然预编译的过程不接触数据，user()等数据库函数的值还是会被编译进SQL语句，所以会被显示出来。（引用P神的猜测）</p>
-<h2 id="预编译下的SQL注入"><a href="#预编译下的SQL注入" class="headerlink" title="预编译下的SQL注入"></a>预编译下的SQL注入</h2><p>复现<a target="_blank" rel="noopener" href="https://fushuling.com/">狗and猫</a>师傅的过程，给佬磕一个！</p>
+<h2 id="预编译下的SQL注入"><a href="#预编译下的SQL注入" class="headerlink" title="预编译下的SQL注入"></a>预编译下的SQL注入</h2><p>复现<a class="link"   target="_blank" rel="noopener" href="https://fushuling.com/" >狗and猫<i class="fas fa-external-link-alt"></i></a>师傅的过程，给佬磕一个！</p>
 <h3 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h3><p>从模拟预编译的执行方式来看，他只是普通的加上了反斜杠进行转义，可以想到SQL注入中的宽字节注入，宽字节注入存在的条件就是，服务端处理用户输入时使用的编码和数据库解析的编码（需使用宽字节编码，如GBK、GB2312等）不同，并且服务端对输入的特殊字符进行了转义。通常，UTF-8中单个字符由1-4个字节表示，宽字节编码中的汉字可以使用两个字节表示。在GBK编码的数据库中，%5c(反斜杠)和某些合法字节组合在一起时，会被解释成一个合法的双字节字符，就可以绕过反斜杠的转义效果。</p>
 <p>例如，输入的内容为<code>%df&#39; OR &#39;1&#39;=&#39;1</code>，在服务端会将输入的单引号转义为<code>\&#39;</code>，但是在数据库端处理输入的内容时，<code>%5c和%df就会结合成</code>  <code>%df%5c</code>，会被数据库解释成一个汉字，因此语句最终就会变成：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27;合法字符&#x27; OR &#x27;1&#x27;=&#x27;1</span><br></pre></td></tr></table></figure>
@@ -256,26 +462,26 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2024-12-17T09:18:56.759432Z	   38 Connect	root@localhost on test using Socket</span><br><span class="line">2024-12-17T09:18:56.760556Z	   38 Prepare	select * from user order by ?</span><br><span class="line">2024-12-17T09:18:56.760722Z	   38 Execute	select * from user order by &#x27;id&#x27;</span><br><span class="line">2024-12-17T09:18:56.761679Z	   38 Close stmt	</span><br><span class="line">2024-12-17T09:18:56.761744Z	   38 Quit	</span><br></pre></td></tr></table></figure>
 
 <p>可以看到其中id同样被当作了字符串进行处理，因此我的语句中的order by id并没有按照我预想的功能实现。数据库中，如果数据库的索引失败，查询结果就会等同于oder by NULL或者oder by TRUE，本质上不是一条合法的请求。以下是直接在数据库中做的测试，可看到oder by后为字符串和为NULL的结果都相同：</p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172254481.png" alt="image-20241217172254481"></p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172339843.png" alt="image-20241217172339843"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172254481.png"  alt="image-20241217172254481"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172339843.png"  alt="image-20241217172339843"></p>
 <p>那么，遇到order by 等一系列后面不可参数化的查询语句时，如何进行SQL注入呢，可以通过构造类似布尔盲注的情况进行：</p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172723615.png" alt="image-20241217172723615"></p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172756167.png" alt="image-20241217172756167"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172723615.png"  alt="image-20241217172723615"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217172756167.png"  alt="image-20241217172756167"></p>
 <p>可以看到，当<code>rand(true)</code>和<code>rand(false)</code>时查询出来的内容回显是不同的，因此可以利用这个点进行盲注，构造payload：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user ORDER BY rand(ASCII(mid((select DATABASE()),1 ,1))&gt;96);</span><br></pre></td></tr></table></figure>
 
 <p>除了oder by、group by等以外，from等可以利用：</p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181805258.png" alt="image-20241217181805258"></p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181823619.png" alt="image-20241217181823619"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181805258.png"  alt="image-20241217181805258"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181823619.png"  alt="image-20241217181823619"></p>
 <p>select 后也可以</p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181902526.png" alt="image-20241217181902526"></p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181920905.png" alt="image-20241217181920905"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181902526.png"  alt="image-20241217181902526"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181920905.png"  alt="image-20241217181920905"></p>
 <p>limit后：</p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181958311.png" alt="image-20241217181958311"></p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182032803.png" alt="image-20241217182032803"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217181958311.png"  alt="image-20241217181958311"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182032803.png"  alt="image-20241217182032803"></p>
 <p>Join:</p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182658142.png" alt="image-20241217182658142"></p>
-<p><img src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182713839.png" alt="image-20241217182713839"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182658142.png"  alt="image-20241217182658142"></p>
+<p><img   src="https://mac-pic-1314279731.cos.ap-nanjing.myqcloud.com/image-20241217182713839.png"  alt="image-20241217182713839"></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总之，针对预编译的SQL注入主要就在于，无法添加引号的位置就无法进行参数化绑定，进而也无法执行预编译，这也导致了oder by、group by等使用的场景成为了SQL注入的薄弱点。</p>
 <h3 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h3><ol>
 <li>白名单验证：在后段对传入的参数进行验证，只允许指定的合法字段进入SQL查询，避免用户输入敏感语句。</li>
@@ -283,37 +489,462 @@
 <li>合理配置框架：对于MyBatis等框架中必须使用${}拼接参数的情况，开发时应将输入控制在白名单范围内。</li>
 </ol>
 <p>写完这篇文章后，发现xsheep师傅分享的站点关闭了，也没有办法去再复现，后续如果再遇到类似的情况，在实际场景中尝试一下。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://fushuling.com/index.php/2023/10/27/%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8Esql%E6%B3%A8%E5%85%A5/">https://fushuling.com/index.php/2023/10/27/预编译与sql注入/</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lsdb/p/12084038.html">https://www.cnblogs.com/lsdb/p/12084038.html</a><br><a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/thinkphp5-in-sqlinjection.html">https://www.leavesongs.com/PENETRATION/thinkphp5-in-sqlinjection.html</a><br><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/10839?time__1311=CqjxRDcGeeqDqGXYkDIE4RhiCtDtDnGBx2YD&u_atoken=d4eb856adbc1fc67dd3072937d7cefa7&u_asig=1a0c399817340574489158966e003e">https://xz.aliyun.com/t/10839?time__1311=CqjxRDcGeeqDqGXYkDIE4RhiCtDtDnGBx2YD&amp;u_atoken=d4eb856adbc1fc67dd3072937d7cefa7&amp;u_asig=1a0c399817340574489158966e003e</a></p>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yosheep.com">YoSheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yosheep.com/posts/10372.html">https://yosheep.com/posts/10372.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yosheep.com" target="_blank">YoSheep's 学习笔记</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/WEB/">WEB</a><a class="post-meta__tags" href="/tags/SQL%E6%B3%A8%E5%85%A5/">SQL注入</a></div><div class="post_share"><div class="social-share" data-image="/img/yeah_circle.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/6245f930.html" title="大模型提示词---Prompt Engineering（提示工程）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">大模型提示词---Prompt Engineering（提示工程）</div></div></a></div><div class="next-post pull-right"><a href="/posts/63987.html" title="逆向学习(3)---IDA的使用和实践"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">逆向学习(3)---IDA的使用和实践</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/cb3612fa.html" title="SQL注入---常见分类攻击方式总结与绕过"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-06-28</div><div class="title">SQL注入---常见分类攻击方式总结与绕过</div></div></a></div><div><a href="/posts/837881d6.html" title="CVE-2024-9047复现及成因分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-27</div><div class="title">CVE-2024-9047复现及成因分析</div></div></a></div><div><a href="/posts/b1433c19.html" title="Java安全篇(2)-ysoserial使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-23</div><div class="title">Java安全篇(2)-ysoserial使用</div></div></a></div><div><a href="/posts/14897.html" title="HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-10</div><div class="title">HTTP API授权认证：服务器的灵魂三问——你是谁？你要干啥？你能干啥？</div></div></a></div><div><a href="/posts/b97f01f6.html" title="Java安全篇(3)-CC链"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-29</div><div class="title">Java安全篇(3)-CC链</div></div></a></div><div><a href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-22</div><div class="title">Java安全学习(1)-Java反序列化基础</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="toc-number">1.</span> <span class="toc-text">写在前面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E5%8C%96%E6%9F%A5%E8%AF%A2"><span class="toc-number">2.</span> <span class="toc-text">参数化查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F%E9%A2%84%E5%A4%84%E7%90%86%EF%BC%88%E5%81%87%E9%A2%84%E7%BC%96%E8%AF%91%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">模拟预处理（假预编译）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9C%9F%E9%A2%84%E7%BC%96%E8%AF%91"><span class="toc-number">4.</span> <span class="toc-text">真预编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E8%A2%AB%E6%89%A7%E8%A1%8C"><span class="toc-number">5.</span> <span class="toc-text">报错注入为什么会被执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8B%E7%9A%84SQL%E6%B3%A8%E5%85%A5"><span class="toc-number">6.</span> <span class="toc-text">预编译下的SQL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="toc-number">6.1.</span> <span class="toc-text">宽字节注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%AA%E8%BF%9B%E8%A1%8C%E5%8F%82%E6%95%B0%E7%BB%91%E5%AE%9A%E7%9A%84%E9%A2%84%E7%BC%96%E8%AF%91"><span class="toc-number">6.2.</span> <span class="toc-text">未进行参数绑定的预编译</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E6%B3%95%E9%A2%84%E7%BC%96%E8%AF%91%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-number">6.3.</span> <span class="toc-text">无法预编译的位置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B2%E5%BE%A1"><span class="toc-number">7.1.</span> <span class="toc-text">防御</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">8.</span> <span class="toc-text">参考</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/2bc5867c.html" title="npm 源投毒研究系列（一）：从包结构理解攻击面">npm 源投毒研究系列（一）：从包结构理解攻击面</a><time datetime="2026-05-21T16:48:29.000Z" title="发表于 2026-05-22 00:48:29">2026-05-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/a0b15ece.html" title="内网渗透(3)：凭据收集与凭据复用">内网渗透(3)：凭据收集与凭据复用</a><time datetime="2026-05-05T08:54:44.000Z" title="发表于 2026-05-05 16:54:44">2026-05-05</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/d7ddb843.html" title="内网渗透(2)：端口探测与权限提升">内网渗透(2)：端口探测与权限提升</a><time datetime="2026-04-29T12:33:47.000Z" title="发表于 2026-04-29 20:33:47">2026-04-29</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/a1d0c9d1.html" title="内网渗透(1)：通道构建与主机发现">内网渗透(1)：通道构建与主机发现</a><time datetime="2026-04-27T19:03:55.000Z" title="发表于 2026-04-28 03:03:55">2026-04-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/5887943d.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week3">【笔记】吴恩达Generative AI with Large Language Models --- Week3</a><time datetime="2026-02-24T03:04:06.000Z" title="发表于 2026-02-24 11:04:06">2026-02-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2026 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
-  const initValine = () => {
-    const valine = new Valine(Object.assign({
-      el: '#vcomment',
-      appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
-      appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
-      avatar: 'monsterid',
-      serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com',
-      emojiMaps: "",
-      path: window.location.pathname,
-      visitor: false
-    }, null))
-  }
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a class="link"   target="_blank" rel="noopener" href="https://fushuling.com/index.php/2023/10/27/%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8Esql%E6%B3%A8%E5%85%A5/" >https://fushuling.com/index.php/2023/10/27/预编译与sql注入/<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://www.cnblogs.com/lsdb/p/12084038.html" >https://www.cnblogs.com/lsdb/p/12084038.html<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/thinkphp5-in-sqlinjection.html" >https://www.leavesongs.com/PENETRATION/thinkphp5-in-sqlinjection.html<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://xz.aliyun.com/t/10839?time__1311=CqjxRDcGeeqDqGXYkDIE4RhiCtDtDnGBx2YD&u_atoken=d4eb856adbc1fc67dd3072937d7cefa7&u_asig=1a0c399817340574489158966e003e" >https://xz.aliyun.com/t/10839?time__1311=CqjxRDcGeeqDqGXYkDIE4RhiCtDtDnGBx2YD&amp;u_atoken=d4eb856adbc1fc67dd3072937d7cefa7&amp;u_asig=1a0c399817340574489158966e003e<i class="fas fa-external-link-alt"></i></a></p>
 
-  const loadValine = async () => {
-    if (typeof Valine === 'function') initValine()
-    else {
-      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
-      initValine()
-    }
-  }
+          
+        </div>
 
-  if ('Valine' === 'Valine' || !false) {
-    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
-    else setTimeout(loadValine, 0)
-  } else {
-    window.loadOtherComment = loadValine
-  }
-})()</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
-POWERMODE.shake = true;
-POWERMODE.mobile = false;
-document.body.addEventListener('input', POWERMODE);
-</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
+        
+            
+<div class="post-copyright-info-container border-box">
+  <div class="copyright-info-content border-box">
+    <div class="copyright-info-top border-box">
+      <div class="copyright-post-title border-box text-ellipsis">
+        参数化查询对SQL注入的防护思考---曾经自信的误判
+      </div>
+
+      <div class="copyright-post-link border-box text-ellipsis">
+        posts/10372.html
+      </div>
+    </div>
+
+    <div class="copyright-info-bottom border-box">
+      <div class="copyright-post-author bottom-item">
+        <div class="type">
+          作者
+        </div>
+        <div class="content">YoSheep</div>
+      </div>
+
+      <div class="post-time bottom-item">
+        <div class="type">
+          发布于
+        </div>
+        <div class="content">2024-12-16 01:24</div>
+      </div>
+
+
+      <div class="post-license bottom-item">
+        <div class="type">
+          许可
+        </div>
+        <div class="content tooltip" data-tooltip-content="CC BY-NC-SA 4.0">
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank">
+            
+              <i class="fa-brands fa-creative-commons"></i>
+              <i class="fa-brands fa-creative-commons-by"></i>
+              <i class="fa-brands fa-creative-commons-nc"></i>
+              <i class="fa-brands fa-creative-commons-sa"></i>
+            
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <i class="copyright-bg fa-solid fa-copyright"></i>
+  </div>
+  <div class="copy-copyright-info flex-center tooltip" data-tooltip-content="复制版权信息" data-tooltip-offset-y="-2px">
+    <i class="fa-solid fa-copy"></i>
+  </div>
+</div>
+
+        
+
+        <div class="post-bottom-tags-and-share border-box">
+          <div>
+            
+              <ul class="post-tags-box border-box">
+                
+                  <li class="tag-item border-box">
+                    <i class="icon fas fa-hashtag"></i>&nbsp;<a href="/tags/WEB/">WEB</a>
+                  </li>
+                
+                  <li class="tag-item border-box">
+                    <i class="icon fas fa-hashtag"></i>&nbsp;<a href="/tags/SQL%E6%B3%A8%E5%85%A5/">SQL注入</a>
+                  </li>
+                
+              </ul>
+            
+          </div>
+          <div>
+            
+              <div class="post-share-container border-box">
+  <ul class="share-list-wrap border-box">
+    <li class="qq share-item border-box flex-center tooltip"
+      data-tooltip-content="分享到 QQ"
+    >
+      <i class="fa-brands fa-qq"></i>
+    </li>
+    <li class="wechat share-item border-box flex-center tooltip tooltip-img"
+      data-tooltip-content="分享到微信"
+      data-tooltip-img-tip="微信扫一扫"
+      data-tooltip-img-style="background-color: #fff; top: -10px; padding: 0.6rem 0.6rem 0.1rem 0.6rem;"
+    >
+      <i class="fa-brands fa-weixin"></i>
+    </li>
+    <li class="weibo share-item border-box flex-center tooltip"
+      data-tooltip-content="分享到微博"
+    >
+      <i class="fa-brands fa-weibo"></i>
+    </li>
+  </ul>
+</div>
+
+            
+          </div>
+        </div>
+
+        
+
+        
+          <div class="post-nav border-box">
+            
+              <div class="prev-post">
+                <a class="prev"
+                  rel="prev"
+                  href="/posts/6245f930.html"
+                  title="大模型提示词---Prompt Engineering（提示工程）"
+                >
+                  <span class="left arrow-icon flex-center">
+                    <i class="fas fa-chevron-left"></i>
+                  </span>
+                  <span class="title flex-center">
+                    <span class="post-nav-title-item text-ellipsis">大模型提示词---Prompt Engineering（提示工程）</span>
+                    <span class="post-nav-item">上一篇</span>
+                  </span>
+                </a>
+              </div>
+            
+            
+              <div class="next-post">
+                <a class="next"
+                  rel="next"
+                  href="/posts/63987.html"
+                  title="逆向学习(3)---IDA的使用和实践"
+                >
+                  <span class="title flex-center">
+                    <span class="post-nav-title-item text-ellipsis">逆向学习(3)---IDA的使用和实践</span>
+                    <span class="post-nav-item">下一篇</span>
+                  </span>
+                  <span class="right arrow-icon flex-center">
+                    <i class="fas fa-chevron-right"></i>
+                  </span>
+                </a>
+              </div>
+            
+          </div>
+        
+
+        
+          
+
+
+
+
+
+
+        
+      </div>
+    </div>
+
+    
+      <div class="pc-post-toc right-toc">
+        <div class="post-toc-wrap border-box">
+  <div class="post-toc border-box">
+    <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E5%8C%96%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.</span> <span class="nav-text">参数化查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E9%A2%84%E5%A4%84%E7%90%86%EF%BC%88%E5%81%87%E9%A2%84%E7%BC%96%E8%AF%91%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">模拟预处理（假预编译）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">真预编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E8%A2%AB%E6%89%A7%E8%A1%8C"><span class="nav-number">5.</span> <span class="nav-text">报错注入为什么会被执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8B%E7%9A%84SQL%E6%B3%A8%E5%85%A5"><span class="nav-number">6.</span> <span class="nav-text">预编译下的SQL注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="nav-number">6.1.</span> <span class="nav-text">宽字节注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E8%BF%9B%E8%A1%8C%E5%8F%82%E6%95%B0%E7%BB%91%E5%AE%9A%E7%9A%84%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">6.2.</span> <span class="nav-text">未进行参数绑定的预编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E6%B3%95%E9%A2%84%E7%BC%96%E8%AF%91%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-number">6.3.</span> <span class="nav-text">无法预编译的位置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B2%E5%BE%A1"><span class="nav-number">7.1.</span> <span class="nav-text">防御</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol>
+  </div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+
+        
+      </div>
+    </div>
+
+    <div class="page-main-content-bottom border-box">
+      
+<footer class="footer border-box">
+  <div class="copyright-info info-item">
+  &copy;&nbsp;<span>2023</span>&nbsp;-&nbsp;2026
+  
+      &nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;&nbsp;<a href="/">YoSheep</a>
+    
+  </div>
+
+  <div class="theme-info info-item">
+    由&nbsp;<a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;驱动&nbsp;&&nbsp;主题&nbsp;<a class="keep-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep</a>
+  </div>
+
+  
+
+  
+    <div class="count-info info-item">
+      
+        <span class="count-item border-box word">
+          <span class="item-type border-box">总字数</span>
+          <span class="item-value border-box word">143.7k</span>
+        </span>
+      
+
+      
+
+      
+    </div>
+  
+
+  
+</footer>
+
+    </div>
+  </div>
+
+  <!-- post tools -->
+  
+    <div class="post-tools right-toc">
+      <div class="post-tools-container border-box">
+  <ul class="post-tools-list border-box">
+    <!-- PC encrypt again -->
+    
+
+    <!-- PC TOC show toggle -->
+    
+      <li class="tools-item flex-center toggle-show-toc">
+        <i class="fas fa-list"></i>
+      </li>
+    
+
+    <!-- PC go comment -->
+    
+
+    <!-- PC full screen -->
+    <li class="tools-item flex-center full-screen">
+      <i class="fa-solid fa-expand"></i>
+    </li>
+  </ul>
+</div>
+
+    </div>
+  
+
+  <!-- side tools -->
+  <div class="side-tools">
+    <div class="side-tools-container border-box ">
+  <ul class="side-tools-list side-tools-show-handle border-box">
+    <li class="tools-item tool-font-adjust-plus flex-center">
+      <i class="fas fa-search-plus"></i>
+    </li>
+
+    <li class="tools-item tool-font-adjust-minus flex-center">
+      <i class="fas fa-search-minus"></i>
+    </li>
+
+    <!-- toggle chinese -->
+    
+      <li class="tools-item tool-toggle-chinese flex-center">
+        <button type="button"
+            data-native-script="cn"
+            data-opencc-src="/js/libs/opencc.full.js"
+            data-label-cn="切换为简体中文"
+            data-label-tw="切换为繁体中文"
+            data-label-error="简繁转换加载失败，点击重试"
+        >
+          繁
+        </button>
+      </li>
+    
+
+    <!-- toggle mode -->
+    
+      <li class="tools-item tool-toggle-theme-mode flex-center">
+        <i class="fas fa-moon"></i>
+      </li>
+    
+
+    <!-- rss -->
+    
+      <li class="tools-item rss flex-center">
+        <a class="flex-center"
+          href="/atom.xml"
+          target="_blank"
+        >
+          <i class="fas fa-rss"></i>
+        </a>
+      </li>
+    
+
+    <!-- to bottom -->
+    <li class="tools-item tool-scroll-to-bottom flex-center">
+      <i class="fas fa-arrow-down"></i>
+    </li>
+  </ul>
+
+  <ul class="exposed-tools-list border-box">
+    
+      <li class="tools-item toggle-show-toc-tablet flex-center">
+        <i class="fas fa-list"></i>
+      </li>
+    
+
+    
+
+    <li class="tools-item tool-toggle-show flex-center">
+      <i class="fas fa-cog fa-spin"></i>
+    </li>
+
+    <li class="tools-item tool-scroll-to-top flex-center show-arrow">
+      <i class="arrow fas fa-arrow-up"></i>
+      <span class="percent"></span>
+    </li>
+  </ul>
+</div>
+
+  </div>
+
+  <!-- image mask -->
+  <div class="zoom-in-image-mask">
+  <img class="zoom-in-image">
+</div>
+
+
+  <!-- local search -->
+  
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+    <div class="search-header">
+      <span class="search-input-field-pre">
+      <i class="fas fa-keyboard"></i>
+      </span>
+      <div class="search-input-container">
+        <input autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            placeholder="搜索..."
+            spellcheck="false"
+            type="search"
+            class="search-input"
+        >
+      </div>
+      <span class="close-popup-btn">
+        <i class="fas fa-times"></i>
+      </span>
+    </div>
+    <div id="search-result">
+      <div id="no-result">
+        <i class="fas fa-spinner fa-pulse fa-5x fa-fw"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+  <!-- tablet toc -->
+  
+    <div class="tablet-post-toc-mask">
+      <div class="tablet-post-toc">
+        <div class="post-toc-wrap border-box">
+  <div class="post-toc border-box">
+    <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E5%8C%96%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.</span> <span class="nav-text">参数化查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E9%A2%84%E5%A4%84%E7%90%86%EF%BC%88%E5%81%87%E9%A2%84%E7%BC%96%E8%AF%91%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">模拟预处理（假预编译）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">真预编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E8%A2%AB%E6%89%A7%E8%A1%8C"><span class="nav-number">5.</span> <span class="nav-text">报错注入为什么会被执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8B%E7%9A%84SQL%E6%B3%A8%E5%85%A5"><span class="nav-number">6.</span> <span class="nav-text">预编译下的SQL注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5"><span class="nav-number">6.1.</span> <span class="nav-text">宽字节注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E8%BF%9B%E8%A1%8C%E5%8F%82%E6%95%B0%E7%BB%91%E5%AE%9A%E7%9A%84%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">6.2.</span> <span class="nav-text">未进行参数绑定的预编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E6%B3%95%E9%A2%84%E7%BC%96%E8%AF%91%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-number">6.3.</span> <span class="nav-text">无法预编译的位置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B2%E5%BE%A1"><span class="nav-number">7.1.</span> <span class="nav-text">防御</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol>
+  </div>
+</div>
+
+      </div>
+    </div>
+  
+</main>
+
+
+
+
+
+<!-- common js -->
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/toggle-theme.js"></script>
+
+<script src="/js/chinese-convert.js"></script>
+
+<script src="/js/code-block.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+
+<!-- local search -->
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+<!-- lazyload -->
+
+
+<div class="">
+  <!-- home page -->
+  
+
+  <!-- post page -->
+  
+    <!-- post-helper -->
+    
+<script src="/js/post/post-helper.js"></script>
+
+
+    <!-- toc -->
+    
+      
+<script src="/js/post/toc.js"></script>
+
+    
+
+    <!-- copyright-info -->
+    
+      
+<script src="/js/post/copyright-info.js"></script>
+
+    
+
+    <!-- share -->
+    
+      
+<script src="/js/libs/qrcode.js"></script>
+
+      
+<script src="/js/post/share.js"></script>
+
+    
+  
+
+  <!-- categories page -->
+  
+
+  <!-- links page -->
+  
+
+  <!-- photos page -->
+  
+
+  <!-- tools page -->
+  
+</div>
+
+<!-- mermaid -->
+
+
+<!-- pjax -->
+
+
+
+</body>
+</html>

@@ -1,189 +1,657 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>YoSheep's 学习笔记</title><meta name="author" content="YoSheep"><meta name="copyright" content="YoSheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="欢迎各位师傅交流学习vx: sunny下划线yosheep">
-<meta property="og:type" content="website">
-<meta property="og:title" content="YoSheep&#39;s 学习笔记">
-<meta property="og:url" content="https://yosheep.com/page/2/">
-<meta property="og:site_name" content="YoSheep&#39;s 学习笔记">
-<meta property="og:description" content="欢迎各位师傅交流学习vx: sunny下划线yosheep">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://yosheep.com/img/yeah_circle.jpg">
-<meta property="article:author" content="YoSheep">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://yosheep.com/img/yeah_circle.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yosheep.com/page/2/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: '复制成功',
-    error: '复制错误',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: {"limitCount":50,"languages":{"author":"作者: YoSheep","link":"链接: ","source":"来源: YoSheep's 学习笔记","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
-    buttonText: '加载更多'
-  },
-  isPhotoFigcaption: false,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: 'YoSheep\'s 学习笔记',
-  isPost: false,
-  isHome: true,
-  isHighlightShrink: false,
-  isToc: false,
-  postUpdate: '2026-05-22 00:54:29'
-}</script><script>(win=>{
-      win.saveToLocal = {
-        set: (key, value, ttl) => {
-          if (ttl === 0) return
-          const now = Date.now()
-          const expiry = now + ttl * 86400000
-          const item = {
-            value,
-            expiry
-          }
-          localStorage.setItem(key, JSON.stringify(item))
-        },
-      
-        get: key => {
-          const itemStr = localStorage.getItem(key)
-      
-          if (!itemStr) {
-            return undefined
-          }
-          const item = JSON.parse(itemStr)
-          const now = Date.now()
-      
-          if (now > item.expiry) {
-            localStorage.removeItem(key)
-            return undefined
-          }
-          return item.value
-        }
-      }
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="Hexo Theme Keep">
+  <meta name="description" content="欢迎各位师傅交流学习&lt;/br&gt;vx: sunny下划线yosheep">
+  <meta name="author" content="YoSheep">
+  
+  <title>
     
-      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        script.onerror = reject
-        script.onload = script.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          script.onload = script.onreadystatechange = null
-          resolve()
-        }
+    YoSheep&#39;s 学习笔记
+  </title>
+  
+<link rel="stylesheet" href="/css/style.css">
 
-        Object.keys(attr).forEach(key => {
-          script.setAttribute(key, attr[key])
-        })
+  
+    <link rel="shortcut icon" href="/img/favicon.png">
+  
+  
+<link rel="stylesheet" href="/font/css/fontawesome.min.css">
 
-        document.head.appendChild(script)
-      })
-    
-      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onerror = reject
-        link.onload = link.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          link.onload = link.onreadystatechange = null
-          resolve()
-        }
-        document.head.appendChild(link)
-      })
-    
-      win.activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
+  
+<link rel="stylesheet" href="/font/css/regular.min.css">
+
+  
+<link rel="stylesheet" href="/font/css/solid.min.css">
+
+  
+<link rel="stylesheet" href="/font/css/brands.min.css">
+
+  
+  <script>
+    (function () {
+      let theme = localStorage.getItem('KEEP-THEME-STATUS');
+      let classname = "";
+      if (!theme || (JSON.parse(theme).isAutoTheme)){
+        classname = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? "dark-mode" : "light-mode";
       }
-      win.activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
+      else{
+        classname = JSON.parse(theme).isDark ? "dark-mode" : "light-mode";
       }
-      const t = saveToLocal.get('theme')
-    
-        if (t === 'dark') activateDarkMode()
-        else if (t === 'light') activateLightMode()
+      document.documentElement.classList.add(classname);
+    })();
+  </script>
+  <script class="keep-theme-configurations">
+    const KEEP = window.KEEP || {}
+    KEEP.hexo_config = {"hostname":"yosheep.com","root":"/","language":"zh-CN"}
+    KEEP.theme_config = {"base_info":{"primary_color":"#4a7dbe","title":"YoSheep's 学习笔记","author":"YoSheep","avatar":"/img/yeah_circle.jpg","logo":"/img/yeah_circle.jpg","favicon":"/img/favicon.png"},"menu":{"home":"/","archives":"/archives/","categories":"/categories/","tags":"/tags/","links":"/link/","about":"/about/"},"first_screen":{"enable":false,"background_img":"/images/bg.svg","background_img_dark":"/images/bg.svg","description":"Keep writing and Keep loving.","hitokoto":false},"social_contact":{"enable":true,"links":{"github":"https://github.com/yosheep","weixin":null,"qq":null,"weibo":null,"zhihu":null,"twitter":null,"x":null,"facebook":null,"email":"mailto:sunny_cxw@outlook.com"}},"scroll":{"progress_bar":false,"percent":false,"hide_header":true},"home":{"announcement":"佬说：“搞安全的，技术不重要，重要的是要会想。”","category":true,"tag":false,"post_datetime":"created"},"post":{"author_badge":{"enable":false,"level_badge":true,"custom_badge":["One","Two","Three"]},"word_count":{"word":true,"min2read":true},"datetime_format":"YYYY-MM-DD","copyright_info":true,"share":true,"reward":{"enable":false,"img_link":null,"text":null,"icon":null}},"code_block":{"tools":{"enable":true,"style":"default"},"highlight_theme":"default"},"toc":{"enable":true,"number":true,"expand_all":false,"init_open":true,"layout":"right"},"website_count":{"busuanzi_count":{"enable":true,"site_uv":false,"site_pv":false,"page_pv":true}},"local_search":{"enable":true,"preload":false},"comment":{"enable":false,"use":"valine","valine":{"appid":null,"appkey":null,"server_urls":null,"placeholder":null},"gitalk":{"github_id":null,"github_admins":null,"repository":null,"client_id":null,"client_secret":null,"proxy":null},"twikoo":{"env_id":null,"region":null,"version":"2.0.8"},"waline":{"server_url":null,"reaction":false,"version":"3.15.2"},"giscus":{"repo":null,"repo_id":null,"category":"Announcements","category_id":null,"reactions_enabled":false},"artalk":{"server":null},"disqus":{"shortname":null}},"rss":{"enable":true},"lazyload":{"enable":false},"cdn":{"enable":false,"provider":"cdnjs","custom":{"enable":false,"url":null}},"pjax":{"enable":false},"footer":{"since":2023,"word_count":true,"site_deploy":{"enable":false,"provider":"github","url":null},"record":{"enable":false,"list":[{"code":null,"link":null}]}},"inject":{"enable":false,"css":[null],"js":[null]},"root":"","search_db_path":"keep-search.json","source_data":{"links":[{"title":"友情链接"},{"name":"XDLiu","link":"https://liudaxiaxd.github.io/","avatar":"https://liudaxiaxd.github.io/img/kfc0.png","description":"辣个手搓内核的男人"},{"name":"Xsheep","link":"https://xsh11p.github.io/","avatar":"https://zyy0808.github.io/imgs/img/dog.png","description":"一眼ri穿内网"},{"name":"N0va7","link":"https://www.n0va7.cn/","avatar":"https://www.n0va7.cn/avatar.jpg","description":"无限进步"},{"name":"LAT_Dawn","link":"https://www.luminarc.tech/","avatar":"https://www.luminarc.tech/uploads/avatars/avatar_1_84841917-92de-434e-8fad-279822546adbx.jpg","description":"大佬，我们有救了"},{"name":"lrui1","link":"https://lrui1.top/","avatar":"https://lrui1.top/img/avatar.jpg","description":"Java佬带带我"},{"name":"0wnerD1ed","link":"https://0b1t.tech/","avatar":"https://avatars.githubusercontent.com/u/59904423?s=400&u=e2d918cc9959b82599bb4dbfcebb8b912880b9dc&v=4","description":"奶龙奶龙我爱你，就像老鼠爱大米"},{"name":"hongzh0","link":"http://hongzh0.wiki/","avatar":"https://hongzh0.wiki/static-file/88f6fb8b-d64c-44ce…63067a70/c920f187-f6ef-4ddb-bc9d-c8e2f39c18bb.jpg","description":"Hacking Group 0434发起人"}]},"version":"4.4.0"}
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"}
+    KEEP.language_code_block = {"copy":"复制代码","copied":"已复制","fold":"折叠代码块","folded":"已折叠"}
+    KEEP.language_copy_copyright = {"copy":"复制版权信息","copied":"已复制","title":"原文标题","author":"原文作者","link":"原文链接"}
+  </script>
+<meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
+</head>
+
+
+<body>
+<div class="progress-bar-container">
+  
+
+  
+</div>
+
+
+
+<main class="page-container border-box">
+  <!-- home first screen  -->
+  
+
+  <!-- page content -->
+  <div class="page-main-content border-box is-home">
+    <div class="page-main-content-top">
       
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
+<header class="header-wrapper">
+
+  <div class="border-box header-content">
+    <div class="left flex-start border-box">
+      
+        <a class="logo-image border-box" href="/">
+          <img src="/img/yeah_circle.jpg">
+        </a>
+      
+      <a class="site-name border-box" href="/">
+        YoSheep&#39;s 学习笔记
+      </a>
+    </div>
+
+    <div class="right border-box">
+      <div class="pc border-box">
+        <ul class="menu-list border-box">
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/">
+                
+                首页
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/archives/">
+                
+                归档
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/categories/">
+                
+                分类
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/tags/">
+                
+                标签
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/link/">
+                
+                友链
+                
+              </a>
+              
+            </li>
+          
+            
+            <li class="menu-item flex-start border-box">
+              <a class="menu-text-color border-box" href="/about/">
+                
+                关于
+                
+              </a>
+              
+            </li>
+          
+          
+            <li class="menu-item search search-popup-trigger">
+              <i class="menu-text-color fas search fa-search"></i>
+            </li>
+          
+        </ul>
+      </div>
+      <div class="mobile border-box flex-start">
+        
+          <div class="icon-item search search-popup-trigger"><i class="fas fa-search"></i></div>
+        
+        <div class="icon-item menu-bar">
+          <div class="menu-bar-middle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-drawer">
+    <ul class="drawer-menu-list border-box">
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/">
+              
+              首页
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/archives/">
+              
+              归档
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/categories/">
+              
+              分类
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/tags/">
+              
+              标签
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/link/">
+              
+              友链
+            </a>
+            
+          </label>
+          
+        </li>
+      
+        
+        <li class="drawer-menu-item border-box not-sub-menu">
+          <label class="drawer-menu-label border-box">
+            <a class="drawer-menu-text-color left-side flex-start border-box" href="/about/">
+              
+              关于
+            </a>
+            
+          </label>
+          
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="window-mask"></div>
+
+</header>
+
+
+    </div>
+
+    <div class="page-main-content-middle border-box">
+
+      <div class="main-content border-box">
+        
+
+          <div class="home-content-container fade-in-down-animation">
+  
+    <div class="website-announcement border-box">
+      <i class="icon left fa-solid fa-bullhorn"></i>
+      <div class="announcement border-box text-ellipsis">
+        <p>佬说：“搞安全的，技术不重要，重要的是要会想。”</p>
+
+      </div>
+      <i class="icon right close fa-solid fa-close"></i>
+    </div>
+  
+  <ul class="home-post-list border-box">
     
-      const detectApple = () => {
-        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-          document.documentElement.classList.add('apple')
-        }
-      }
-      detectApple()
-    })(window)</script><meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="YoSheep's 学习笔记" type="application/atom+xml">
-</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/yeah_circle.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url('/img/background.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="YoSheep's 学习笔记"><span class="site-name">YoSheep's 学习笔记</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">YoSheep's 学习笔记</h1><div id="site-subtitle"><span id="subtitle"></span></div><div id="site_social_icons"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/4da32f64.html" title="Gap Year Review --- 在路上的一年">Gap Year Review --- 在路上的一年</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-09-21T14:18:05.000Z" title="发表于 2025-09-21 22:18:05">2025-09-21</time></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/">碎碎念</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/4da32f64.html#post-comment"><span class="valine-comment-count" data-xid="/posts/4da32f64.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">Gap Year Review — 在路上的一年度过了很漫长，也很美好的一年。
-明天就要去学校注册了，很奇怪，没有实感，心里也没有太多波澜。大四阶段只有一节课，距离上一次真正坐在教室里，已经过去了将近两年。我不知道，逃离校园这么久后，自己是否还能重新沉稳下来。
-当初选择 gap 的原因，其实很简单——累了。东亚小孩的一生，总是被社会的时针裹挟着推进。每一个拐点，似乎都只能匆忙做出“最好的”选择，却过着并不喜欢的人生。从高中起，我总是被别人的光鲜经历和短视频里的热词触动——“人生应该是旷野”。我暗暗告诉自己，这才是我向往的生活方式。但转头，迎接我的依旧是成山的试卷、写不完的作业、赶不完的 ddl。矛盾而拧巴。
-这一年做过的事，刚开始想不起来几件，甚至一度被吓到。幸好翻开相册，一些画面被定格下来。
-离开学校前，和朋友们拍了毕业照。去年忘了发，就补在这一条里吧。翻看时，那天的笑容依旧历历在目。
-刚离开学校，就去潮汕自驾。一路吃吃喝喝，实惠又美味，最难忘的是南澳岛：沿环岛公路开车，右手边就是大海。夜里赤脚踩在沙滩上，温热的海浪拍打脚背。因为是淡季，用不贵的价格订到了海景房，阳台还能看到沙滩边的 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/b97f01f6.html" title="Java安全篇(3)-CC链">Java安全篇(3)-CC链</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-08-29T06:26:28.000Z" title="发表于 2025-08-29 14:26:28">2025-08-29</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/WEB/">WEB</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/WEB/">WEB</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/JAVA/">JAVA</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/b97f01f6.html#post-comment"><span class="valine-comment-count" data-xid="/posts/b97f01f6.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">环境使用Java的8u65版本调试该链
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/4da32f64.html">
+                Gap Year Review --- 在路上的一年
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              Gap Year Review — 在路上的一年度过了很漫长，也很美好的一年。
+明天就要去学校注册了，很奇怪，没有实感，心里也没有太多波澜。大四阶段只有一节课，距离上一次真正坐在教室里，已经过去了将近两年。我不知道，逃离校园这么久后，自己是否还能重新...
+            
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Mon Sep 22 2025 00:18:05 GMT+1000"
+        >2025-09-22 00:18:05</span>
+      </span>
+    
+
+    
+
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/4da32f64.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/b97f01f6.html">
+                Java安全篇(3)-CC链
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              环境使用Java的8u65版本调试该链
 下载地址：https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html
 
 mvn版本：
-12345&lt;dependency&gt;	&lt;groupId&gt;commons-collections&lt;/groupId&gt;	&lt;artifactId&gt;commons-collections&lt;/artifactId&gt;	&lt;version&gt;3.2.1&lt;/version&gt;&lt;/dependency&gt;
+12345&lt;depe...
+            
+          </div>
 
-以上添加至pom.xml文件中
-回顾反序列化的攻击思路反序列化的一个基本过程，通常我们需要先找到一个危险方法，例如此处找到的是 r.exec() ，然后找到一个调用该危险方法的对象的方法，此处假设对象为 O3 的 abc 方法，然后去找调用了 O3 的 abc 方法的位置（或者是同名函数），例如找到了 O2 的 xxx ,以此类推找到O.aaa等，最终需要找到一个入口，接收任意对象并执行read ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/105b1196.html" title="XML 外部实体注入（XXE）漏洞基本原理">XML 外部实体注入（XXE）漏洞基本原理</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-08-24T09:40:38.000Z" title="发表于 2025-08-24 17:40:38">2025-08-24</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/WEB/">WEB</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/WEB/">WEB</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/XXE/">XXE</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/105b1196.html#post-comment"><span class="valine-comment-count" data-xid="/posts/105b1196.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">XML 外部实体注入（XXE）是一种通过在 XML 输入中引用外部实体而利用解析器缺陷的攻击方式。也就是说，当应用程序在处理 XML 文档时，如果没有正确禁用对外部实体（External Entity）的解析，就可能被构造恶意的实体引用所利用 。这种攻击可以导致敏感文件泄露、内网端口扫描、SSRF（服务器端请求伪造）、拒绝服务甚至部分场景下的远程代码执行等严重后果。简而言之，XXE 的根本原因在于 XML 解析器默认允许 DTD（文档类型定义）及外部实体，攻击者可借此构造引用系统或网络资源的实体，而将这些内容注入到解析过程。
-XXE 漏洞发生时往往是因为开发者未对 XML 输入进行严格过滤或使用弱配置的解析器。例如，缺少disallow-doctype-decl特性或允许external-general-entities解析，就会让攻击者有机可乘。一旦漏洞被触发，XML 中定义的外部实体就会被解析器读取并替换到 XML 内容中，导致文件内容返回给攻击者。实践中，许多XXE实例往往发生在允许用户上传或提交 XML 文档的位置，如配置文件上传、SOAP&#x2F;XML API 接口等场景 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/b1433c19.html" title="Java安全篇(2)-ysoserial使用">Java安全篇(2)-ysoserial使用</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-08-23T11:56:54.000Z" title="发表于 2025-08-23 19:56:54">2025-08-23</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/WEB/">WEB</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/WEB/">WEB</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/JAVA/">JAVA</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/b1433c19.html#post-comment"><span class="valine-comment-count" data-xid="/posts/b1433c19.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">Ysoserial工具简介与安装ysoserial是一款用来生成Java反序列化漏洞payload的验证工具，其中内置了多种常见的库中的gadget chain，可以直接通过命令和链类型生成序列化数据，一旦目标应用不安全地反序列化这些数据就会触发命令执行。
-ysoserial项目地址：https://github.com/frohoff/ysoserial
+          
 
-下载预编译 JAR：访问 GitHub Releases，下载如 ysoserial-all.jar 等可执行 JAR 文件（无需编译）。
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Fri Aug 29 2025 16:26:28 GMT+1000"
+        >2025-08-29 16:26:28</span>
+      </span>
+    
 
-从源码编译：使用 git clone https://github.com/frohoff/ysoserial.git 拉取源码，然后进入目录运行 mvn clean package -DskipTests 编译，生成可执行 JAR 。
+    
 
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
 
-安装完成后，即可使用 java -jar ysoserial.jar 查看帮助，出现Payload列表即表示安装成功
+    
 
-使用方法使用 Yoserial 生成 payload 的基本方法是调用其主类：
-1java -jar ysoserial-all.ja ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/affd600b.html" title="Java安全学习(1)-Java反序列化基础">Java安全学习(1)-Java反序列化基础</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-08-22T12:47:19.000Z" title="发表于 2025-08-22 20:47:19">2025-08-22</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/WEB/">WEB</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/WEB/">WEB</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/JAVA/">JAVA</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/affd600b.html#post-comment"><span class="valine-comment-count" data-xid="/posts/affd600b.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">在Java中，序列化（Serialization）是将对象转换为字节流，从而可以方便地保存到文件、传输到网络或持久化存储；反序列化（Deserialization）则是将字节流重新还原为对象。
+    
+    
+    
+    
+  </div>
 
-注意：如果一个类要支持序列化，必须实现 java.io.Serializable 接口。
+  
+    <a class="home-read-more" href="/posts/b97f01f6.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
 
-序列化与反序列化示例下面通过一个简单的 Student 类，演示对象的序列化与反序列化过程。
-Student类（实现了Serializable接口）Serializable 接口是java提供的一个序列化接口，它用来标识当前类可以被ObjectOutputStream序列化，以及可以被ObjectInputStream反序列化。
-12345678910111213141516171819202122import java.io.Serializable;public class Student implements Serializable &#123;    private String name;    private int age;    private String studentId;    ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/12b7d7b4.html" title="Python Pickle 反序列化漏洞">Python Pickle 反序列化漏洞</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-08-12T04:46:34.000Z" title="发表于 2025-08-12 12:46:34">2025-08-12</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/WEB/">WEB</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/WEB/">WEB</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/Pickle/">Pickle</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/12b7d7b4.html#post-comment"><span class="valine-comment-count" data-xid="/posts/12b7d7b4.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">1. Pickle 基础1.1 什么是 Pickle？Pickle是Python内置的序列化&#x2F;反序列化的模块，它能将任意Python对象转换为二进制流并还原。Pickle文档明确警告：“pickle模块不安全；只有在信任数据源时才使用。恶意构造的pickle数据可以在反序列化时执行任意代码” 。Pickle与JSON的主要区别在于：JSON只能表示基本类型（数值、字符串、列表、字典等），而Pickle能够序列化几乎任意Python对象（类实例、函数、复杂数据结构等），因此功能更强但也风险更高。
-Pickle支持多种协议版本（目前Python官方支持0–5共6种协议），其中协议0为文本格式（Python 2兼容），协议1–3为历史二进制格式，协议4引入对超大对象和新类型的支持，协议5引入离带缓冲区以加速大对象传输 。不同协议产生的字节流会略有不同，但反序列化时Python自动探测版本。开发者通常只需调用pickle.dumps(obj)（或dump(obj, file)）来序列化，以及pickle.loads(data)（或load(file)）来反序列化。
-各协议详细可见文档 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/16f3418.html" title="安卓开发基础学习">安卓开发基础学习</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-08-09T13:16:12.000Z" title="发表于 2025-08-09 21:16:12">2025-08-09</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Android/">Android</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/Android/">Android</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/%E5%AD%A6%E4%B9%A0/">学习</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/16f3418.html#post-comment"><span class="valine-comment-count" data-xid="/posts/16f3418.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">第一个安卓项目环境：
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/105b1196.html">
+                XML 外部实体注入（XXE）漏洞基本原理
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              XML 外部实体注入（XXE）是一种通过在 XML 输入中引用外部实体而利用解析器缺陷的攻击方式。也就是说，当应用程序在处理 XML 文档时，如果没有正确禁用对外部实体（External Entity）的解析，就可能被构造恶意的实体引用所利用 。这种...
+            
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Sun Aug 24 2025 19:40:38 GMT+1000"
+        >2025-08-24 19:40:38</span>
+      </span>
+    
+
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/105b1196.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/b1433c19.html">
+                Java安全篇(2)-ysoserial使用
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              Ysoserial工具简介与安装ysoserial是一款用来生成Java反序列化漏洞payload的验证工具，其中内置了多种常见的库中的gadget chain，可以直接通过命令和链类型生成序列化数据，一旦目标应用不安全地反序列化这些数据就会触发命令...
+            
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Sat Aug 23 2025 21:56:54 GMT+1000"
+        >2025-08-23 21:56:54</span>
+      </span>
+    
+
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/b1433c19.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/affd600b.html">
+                Java安全学习(1)-Java反序列化基础
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              在Java中，序列化（Serialization）是将对象转换为字节流，从而可以方便地保存到文件、传输到网络或持久化存储；反序列化（Deserialization）则是将字节流重新还原为对象。
+
+注意：如果一个类要支持序列化，必须实现 java.io...
+            
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Fri Aug 22 2025 22:47:19 GMT+1000"
+        >2025-08-22 22:47:19</span>
+      </span>
+    
+
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/affd600b.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/12b7d7b4.html">
+                Python Pickle 反序列化漏洞
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              1. Pickle 基础1.1 什么是 Pickle？Pickle是Python内置的序列化&#x2F;反序列化的模块，它能将任意Python对象转换为二进制流并还原。Pickle文档明确警告：“pickle模块不安全；只有在信任数据源时才使用。恶意...
+            
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Tue Aug 12 2025 14:46:34 GMT+1000"
+        >2025-08-12 14:46:34</span>
+      </span>
+    
+
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/12b7d7b4.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/16f3418.html">
+                安卓开发基础学习
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              第一个安卓项目环境：
 
 Android Studio 2024.2 
 Java 21.0.5
@@ -191,22 +659,132 @@ SDK:API 24
 虚拟机：Pixel 9 Pro API 27 &#x2F; Android 8.1
 
 项目目录新建项目，可得到目录内容：
-app├── manifests│   └── AndroidManifest.xml├── java│   ├── com.dta.first│   │   └── MainActivity.java│   ├── com.dta.first (androidTest)│   ├── com.dta.first (test)│   └── java (generated)├── res│   ├── drawable│   ├── layout│   ├── mipmap│   ├── values│   └── xml└── res (generated)Gradle Scripts
-manifests目录其中manifest文件用来存放一些安卓应用程序的配置文件，通常每个安卓应用都包含AndroidManifest.xml，是一个全局配置文件， ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/37862da4.html" title="跨站脚本攻击-XSS">跨站脚本攻击-XSS</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-07-19T02:56:24.000Z" title="发表于 2025-07-19 10:56:24">2025-07-19</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/WEB/">WEB</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/WEB/">WEB</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/XSS/">XSS</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/37862da4.html#post-comment"><span class="valine-comment-count" data-xid="/posts/37862da4.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">前置基础：XSS 需要懂哪些前端知识？为了更好理解 XSS，我会先快速讲解一些基础的前端知识，哪怕你没写过网页也能跟上。
+app├─...
+            
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Sat Aug 09 2025 23:16:12 GMT+1000"
+        >2025-08-09 23:16:12</span>
+      </span>
+    
+
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/Android/">Android</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/16f3418.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/37862da4.html">
+                跨站脚本攻击-XSS
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              前置基础：XSS 需要懂哪些前端知识？为了更好理解 XSS，我会先快速讲解一些基础的前端知识，哪怕你没写过网页也能跟上。
 1. HTML 是什么？
 HTML 是网页的“结构语言”，网页上的内容几乎都是用 HTML 描述的。
-页面会由一个个标签构成，比如：
+页面会由一个个标签构成，比...
+            
+          </div>
 
-1234567&lt;html&gt;  &lt;head&gt;&lt;title&gt;网页标题&lt;/title&gt;&lt;/head&gt;  &lt;body&gt;    &lt;h1&gt;主标题&lt;/h1&gt;    &lt;p&gt;这是正文段落&lt;/p&gt;  &lt;/body&gt;&lt;/html&gt;
+          
 
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Sat Jul 19 2025 12:56:24 GMT+1000"
+        >2025-07-19 12:56:24</span>
+      </span>
+    
 
-看到这种 &lt;标签&gt; 的东西，就是 HTML。
-2. HTML 标签的结构：1&lt;tagname attribute=&quot;value&quot;&gt;内容&lt;/tagname&gt;
+    
 
-例如：
-1&lt;a href=&quot;https://example.com&quot;&gt;点我跳转&lt;/a&gt;
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
 
-&lt;a&gt; 是超链接标签，h ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/cb3612fa.html" title="SQL注入---常见分类攻击方式总结与绕过">SQL注入---常见分类攻击方式总结与绕过</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-06-28T01:31:33.000Z" title="发表于 2025-06-28 09:31:33">2025-06-28</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/WEB/">WEB</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/WEB/">WEB</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/SQL%E6%B3%A8%E5%85%A5/">SQL注入</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/cb3612fa.html#post-comment"><span class="valine-comment-count" data-xid="/posts/cb3612fa.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">近期由于准备学校培训内容，对SQL注入的基础知识进行了一些总结，同步一下博客。
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/37862da4.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/cb3612fa.html">
+                SQL注入---常见分类攻击方式总结与绕过
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              近期由于准备学校培训内容，对SQL注入的基础知识进行了一些总结，同步一下博客。
 SQL基础一、数据库的基本概念
 什么是数据库（Database）
 一个存储和管理数据的容器，比如：学生信息管理系统的核心。
@@ -214,106 +792,375 @@ SQL基础一、数据库的基本概念
 什么是表（Table）
 
 
-​	数据库中用于存储数据的结构化格式，每张表有若干“行”和“列”。
-
-行（Row）和列（Column）的区别
-
-一行：表示一条记录（例如一个学生）
-
-一列：表示一个字段（例如“姓名”字段）
-
-
-
-
-二、SQL基础语法1. SELECT语句 - 查询数据select [列名/*] from [表名] where [限制条件]
-示例：
-select * from students;
-假设students表：
-
-
-
-id
-name
-age
-
-
-
-1
-Alice
-18
-
-
-2
-Bob
-19
-
-
-查询 age &#x3D; 18 的所有同学的姓名
-SELECT name FROM students WHERE age = 18;
-2. INSERT语句 - 插入数据insert into students(name, age) values (&#39;Sunny& ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/posts/7547cd0e.html" title="让AI也懵圈：一次CTF中的对抗样本生成与应用">让AI也懵圈：一次CTF中的对抗样本生成与应用</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2025-03-09T14:47:23.000Z" title="发表于 2025-03-09 22:47:23">2025-03-09</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/AI/">AI</a></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/AI/">AI</a><span class="article-meta-link">•</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/%E5%AF%B9%E6%8A%97%E6%A0%B7%E6%9C%AC/">对抗样本</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/posts/7547cd0e.html#post-comment"><span class="valine-comment-count" data-xid="/posts/7547cd0e.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> 条评论</span></span></div><div class="content">让AI也懵圈：一次CTF中的对抗样本生成与应用同步一下推送发的内容
-题目来源：GHCTF。感谢GHCTF主办方的师傅们，特别是公开赛道的设置和提供的高质量赛题。
-引言在当前人工智能的应用中，模型通常会基于大量的数据进行训练，以帮助其做出准确的预测。然而，既然是预测，就难免会出现失误。因此，如何确保模型的鲁棒性和安全性成为了一个至关重要的话题。
-对抗样本（Adversarial Examples）攻击是AI安全中不可忽视的一个隐患。对抗样本是指通过精心设计，对输入数据进行微小修改，通常这些修改对人眼几乎无法察觉，但却能导致模型产生错误的分类或判断。例如，下图展示了这种情况：最左侧是原始图像，中间是添加的微小扰动，右侧则是生成的对抗样本。模型在识别原始图像时，会返回结果为猫（虽然这个数据集分辨率很低，就姑且当图里是猫吧），但是模型识别对抗样本时，则会将其识别为狗。
- 
-但是这时候就有人要问了，“学长学长，你上面讲的东西还是太抽象，太难理解了，有没有更贴近生活的例子？”
-有的兄弟，有的。这样的例子还有两个。
-例如新能源汽车的自动驾驶系统，我们都知道，很多新能源汽车的自动驾驶都会依赖于摄像头和 ...</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#content-inner">3</a><a class="page-number" href="/page/4/#content-inner">4</a><a class="extend next" rel="next" href="/page/3/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/yeah_circle.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">YoSheep</div><div class="author-info__description">欢迎各位师傅交流学习</br>vx: sunny下划线yosheep</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/YoSheep"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yosheep" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:sunny_cxw@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佬说：“搞安全的，技术不重要，重要的是要会想。”</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/2bc5867c.html" title="npm 源投毒研究系列（一）：从包结构理解攻击面">npm 源投毒研究系列（一）：从包结构理解攻击面</a><time datetime="2026-05-21T16:48:29.000Z" title="发表于 2026-05-22 00:48:29">2026-05-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/a0b15ece.html" title="内网渗透(3)：凭据收集与凭据复用">内网渗透(3)：凭据收集与凭据复用</a><time datetime="2026-05-05T08:54:44.000Z" title="发表于 2026-05-05 16:54:44">2026-05-05</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/d7ddb843.html" title="内网渗透(2)：端口探测与权限提升">内网渗透(2)：端口探测与权限提升</a><time datetime="2026-04-29T12:33:47.000Z" title="发表于 2026-04-29 20:33:47">2026-04-29</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/a1d0c9d1.html" title="内网渗透(1)：通道构建与主机发现">内网渗透(1)：通道构建与主机发现</a><time datetime="2026-04-27T19:03:55.000Z" title="发表于 2026-04-28 03:03:55">2026-04-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/posts/5887943d.html" title="【笔记】吴恩达Generative AI with Large Language Models --- Week3">【笔记】吴恩达Generative AI with Large Language Models --- Week3</a><time datetime="2026-02-24T03:04:06.000Z" title="发表于 2026-02-24 11:04:06">2026-02-24</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
-            <i class="fas fa-folder-open"></i>
-            <span>分类</span>
+​	数据库中用于...
             
-            </div>
-            <ul class="card-category-list" id="aside-cat-list">
-            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/AI/"><span class="card-category-list-name">AI</span><span class="card-category-list-count">7</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Android/"><span class="card-category-list-name">Android</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/WEB/"><span class="card-category-list-name">WEB</span><span class="card-category-list-count">15</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E4%BE%9B%E5%BA%94%E9%93%BE%E6%8A%95%E6%AF%92/"><span class="card-category-list-name">供应链投毒</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E5%86%85%E7%BD%91/"><span class="card-category-list-name">内网</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E9%80%86%E5%90%91/"><span class="card-category-list-name">逆向</span><span class="card-category-list-count">3</span></a></li>
-            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/XSS/" style="font-size: 1.1em; color: #999">XSS</a> <a href="/tags/%E9%80%86%E5%90%91/" style="font-size: 1.26em; color: #999fa8">逆向</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 1.1em; color: #999">学习</a> <a href="/tags/LLM/" style="font-size: 1.34em; color: #99a3b0">LLM</a> <a href="/tags/AI/" style="font-size: 1.42em; color: #99a6b7">AI</a> <a href="/tags/Pickle/" style="font-size: 1.1em; color: #999">Pickle</a> <a href="/tags/%E4%BE%9B%E5%BA%94%E9%93%BE%E6%8A%95%E6%AF%92/" style="font-size: 1.1em; color: #999">供应链投毒</a> <a href="/tags/SSRF/" style="font-size: 1.1em; color: #999">SSRF</a> <a href="/tags/CVE/" style="font-size: 1.18em; color: #999ca1">CVE</a> <a href="/tags/%E7%A2%8E%E7%A2%8E%E5%BF%B5/" style="font-size: 1.1em; color: #999">碎碎念</a> <a href="/tags/nom/" style="font-size: 1.1em; color: #999">nom</a> <a href="/tags/XXE/" style="font-size: 1.1em; color: #999">XXE</a> <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 1.1em; color: #999">反序列化</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" style="font-size: 1.1em; color: #999">网络安全</a> <a href="/tags/RCE/" style="font-size: 1.18em; color: #999ca1">RCE</a> <a href="/tags/%E5%AF%B9%E6%8A%97%E6%A0%B7%E6%9C%AC/" style="font-size: 1.1em; color: #999">对抗样本</a> <a href="/tags/WEB/" style="font-size: 1.5em; color: #99a9bf">WEB</a> <a href="/tags/JAVA/" style="font-size: 1.26em; color: #999fa8">JAVA</a> <a href="/tags/SQL%E6%B3%A8%E5%85%A5/" style="font-size: 1.18em; color: #999ca1">SQL注入</a> <a href="/tags/Prompt/" style="font-size: 1.1em; color: #999">Prompt</a> <a href="/tags/CTF/" style="font-size: 1.1em; color: #999">CTF</a> <a href="/tags/MCP/" style="font-size: 1.1em; color: #999">MCP</a> <a href="/tags/%E5%86%85%E7%BD%91/" style="font-size: 1.26em; color: #999fa8">内网</a> <a href="/tags/Android/" style="font-size: 1.1em; color: #999">Android</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span><a class="card-more-btn" href="/archives/" title="查看更多">
-    <i class="fas fa-angle-right"></i></a></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/05/"><span class="card-archive-list-date">五月 2026</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/04/"><span class="card-archive-list-date">四月 2026</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/02/"><span class="card-archive-list-date">二月 2026</span><span class="card-archive-list-count">3</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2026/01/"><span class="card-archive-list-date">一月 2026</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2025/10/"><span class="card-archive-list-date">十月 2025</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2025/09/"><span class="card-archive-list-date">九月 2025</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2025/08/"><span class="card-archive-list-date">八月 2025</span><span class="card-archive-list-count">6</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2025/07/"><span class="card-archive-list-date">七月 2025</span><span class="card-archive-list-count">1</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">32</div></div><div class="webinfo-item"><div class="item-name">本站总字数 :</div><div class="item-count">143.7k</div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2026-05-21T16:54:29.169Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2026 By YoSheep</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
-  function loadValine () {
-    function initValine () {
-      let initData = {
-        el: '#vcomment',
-        appId: 'iSjR5V9ZIytpvfNU137OlQGH-gzGzoHsz',
-        appKey: '9jj4DuX9kTm6wiDHKR1Llu7T',
-        serverURLs: 'https://isjr5v9z.lc-cn-n1-shared.com'
-      }
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Sat Jun 28 2025 11:31:33 GMT+1000"
+        >2025-06-28 11:31:33</span>
+      </span>
+    
+
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/WEB/">WEB</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/cb3612fa.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+      <li class="home-post-item">
+
+        
+
+        <div class="home-post-item-bottom border-box">
+          
+          
+            <h3 class="home-post-title border-box">
+              <a href="/posts/7547cd0e.html">
+                让AI也懵圈：一次CTF中的对抗样本生成与应用
+              </a>
+            </h3>
+          
+
+          <div class="home-post-content keep-markdown-body">
+            
+              让AI也懵圈：一次CTF中的对抗样本生成与应用同步一下推送发的内容
+题目来源：GHCTF。感谢GHCTF主办方的师傅们，特别是公开赛道的设置和提供的高质量赛题。
+引言在当前人工智能的应用中，模型通常会基于大量的数据进行训练，以帮助其做出准确的预测。然...
+            
+          </div>
+
+          
+
+<div class="post-meta-info-container border-box home">
+  <div class="post-meta-info border-box">
+    
+      <span class="meta-info-item border-box">
+        <i class="icon fa-solid fa-file-circle-plus"></i>&nbsp;<span class="home-post-history"
+                                        data-updated="Mon Mar 10 2025 01:47:23 GMT+1100"
+        >2025-03-10 01:47:23</span>
+      </span>
+    
+
+    
+
+    
+      <span class="meta-info-item post-category border-box"><i class="icon fas fa-folder"></i>&nbsp;
+        <ul class="post-category-ul">
+          
+              <li class="category-item"><a href="/categories/AI/">AI</a></li>
+            
+          
+        </ul>
+      </span>
+    
+
+    
+
+    
+    
+    
+    
+  </div>
+
+  
+    <a class="home-read-more" href="/posts/7547cd0e.html">阅读全文&nbsp;<i class="icon fas fa-angle-right"></i></a>
+  
+</div>
+
+        </div>
+      </li>
+    
+  </ul>
+  
+  <div class="paginator border-box flex-center">
+    <div class="border-box first-page paginator-btn allowed">
+      <a class="border-box"><i class="fa-solid fa-angle-double-left"></i></a>
+    </div>
+
+    <div class="border-box paginator-btn allowed">
+      <a class="border-box"
+        href="/"
+      ><i class="fa-solid fa-chevron-left"></i></a>
+    </div>
+
+
+    <div class="page-number-box border-box flex-center">
+      <input class="page-number-input border-box base-style"
+          type="number"
+          value="2"
+          min="1"
+          max="4"
+      /><span class="delimiter base-style">/</span><span class="base-style">4</span>
+    </div>
+
+
+    <div class="border-box paginator-btn allowed">
+      <a class="border-box"
+        href="/page/3/"
+      ><i class="fa-solid fa-chevron-right"></i></a>
+    </div>
+
+    <div class="border-box last-page paginator-btn allowed">
+      <a class="border-box"><i class="fa-solid fa-angle-double-right"></i></a>
+    </div>
+  </div>
+
+
+
+
+</div>
+
+
+        
+      </div>
+    </div>
+
+    <div class="page-main-content-bottom border-box">
       
-      const valine = new Valine(initData)
-    }
+<footer class="footer border-box">
+  <div class="copyright-info info-item">
+  &copy;&nbsp;<span>2023</span>&nbsp;-&nbsp;2026
+  
+      &nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;&nbsp;<a href="/">YoSheep</a>
+    
+  </div>
 
-    if (typeof Valine === 'function') initValine() 
-    else getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js').then(initValine)
-  }
+  <div class="theme-info info-item">
+    由&nbsp;<a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;驱动&nbsp;&&nbsp;主题&nbsp;<a class="keep-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep</a>
+  </div>
 
-  window.pjax ? loadValine() : window.addEventListener('load', loadValine)
-})()</script><script>window.typedJSFn = {
-  init: (str) => {
-    window.typed = new Typed('#subtitle', Object.assign({
-      strings: str,
-      startDelay: 300,
-      typeSpeed: 150,
-      loop: true,
-      backSpeed: 50,
-    }, null))
-  },
-  run: (subtitleType) => {
-    if (true) {
-      if (typeof Typed === 'function') {
-        subtitleType()
-      } else {
-        getScript('https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.min.js').then(subtitleType)
-      }
-    } else {
-      subtitleType()
-    }
-  }
-}
-</script><script>function subtitleType () {
-  if (true) {
-    typedJSFn.init(["一直觉得开源和知识共享，是纯粹又很酷的事。","悄悄的干，万一干砸了就当没干过。","知其然，知其所以然"])
-  } else {
-    document.getElementById("subtitle").textContent = "一直觉得开源和知识共享，是纯粹又很酷的事。"
-  }
-}
-typedJSFn.run(subtitleType)</script></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
-POWERMODE.shake = true;
-POWERMODE.mobile = false;
-document.body.addEventListener('input', POWERMODE);
-</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
+  
+
+  
+    <div class="count-info info-item">
+      
+        <span class="count-item border-box word">
+          <span class="item-type border-box">总字数</span>
+          <span class="item-value border-box word">143.7k</span>
+        </span>
+      
+
+      
+
+      
+    </div>
+  
+
+  
+</footer>
+
+    </div>
+  </div>
+
+  <!-- post tools -->
+  
+
+  <!-- side tools -->
+  <div class="side-tools">
+    <div class="side-tools-container border-box side-tools-show-handle">
+  <ul class="side-tools-list side-tools-show-handle border-box">
+    <li class="tools-item tool-font-adjust-plus flex-center">
+      <i class="fas fa-search-plus"></i>
+    </li>
+
+    <li class="tools-item tool-font-adjust-minus flex-center">
+      <i class="fas fa-search-minus"></i>
+    </li>
+
+    <!-- toggle chinese -->
+    
+      <li class="tools-item tool-toggle-chinese flex-center">
+        <button type="button"
+            data-native-script="cn"
+            data-opencc-src="/js/libs/opencc.full.js"
+            data-label-cn="切换为简体中文"
+            data-label-tw="切换为繁体中文"
+            data-label-error="简繁转换加载失败，点击重试"
+        >
+          繁
+        </button>
+      </li>
+    
+
+    <!-- toggle mode -->
+    
+      <li class="tools-item tool-toggle-theme-mode flex-center">
+        <i class="fas fa-moon"></i>
+      </li>
+    
+
+    <!-- rss -->
+    
+      <li class="tools-item rss flex-center">
+        <a class="flex-center"
+          href="/atom.xml"
+          target="_blank"
+        >
+          <i class="fas fa-rss"></i>
+        </a>
+      </li>
+    
+
+    <!-- to bottom -->
+    <li class="tools-item tool-scroll-to-bottom flex-center">
+      <i class="fas fa-arrow-down"></i>
+    </li>
+  </ul>
+
+  <ul class="exposed-tools-list border-box">
+    
+
+    
+
+    <li class="tools-item tool-toggle-show flex-center">
+      <i class="fas fa-cog fa-spin"></i>
+    </li>
+
+    <li class="tools-item tool-scroll-to-top flex-center show-arrow">
+      <i class="arrow fas fa-arrow-up"></i>
+      <span class="percent"></span>
+    </li>
+  </ul>
+</div>
+
+  </div>
+
+  <!-- image mask -->
+  <div class="zoom-in-image-mask">
+  <img class="zoom-in-image">
+</div>
+
+
+  <!-- local search -->
+  
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+    <div class="search-header">
+      <span class="search-input-field-pre">
+      <i class="fas fa-keyboard"></i>
+      </span>
+      <div class="search-input-container">
+        <input autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            placeholder="搜索..."
+            spellcheck="false"
+            type="search"
+            class="search-input"
+        >
+      </div>
+      <span class="close-popup-btn">
+        <i class="fas fa-times"></i>
+      </span>
+    </div>
+    <div id="search-result">
+      <div id="no-result">
+        <i class="fas fa-spinner fa-pulse fa-5x fa-fw"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+  <!-- tablet toc -->
+  
+</main>
+
+
+
+
+
+
+<!-- common js -->
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/toggle-theme.js"></script>
+
+<script src="/js/chinese-convert.js"></script>
+
+<script src="/js/code-block.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+
+<!-- local search -->
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+<!-- lazyload -->
+
+
+<div class="">
+  <!-- home page -->
+  
+    
+<script src="/js/page/home-page.js"></script>
+
+  
+
+  <!-- post page -->
+  
+
+  <!-- categories page -->
+  
+
+  <!-- links page -->
+  
+
+  <!-- photos page -->
+  
+
+  <!-- tools page -->
+  
+</div>
+
+<!-- mermaid -->
+
+
+<!-- pjax -->
+
+
+
+</body>
+</html>
